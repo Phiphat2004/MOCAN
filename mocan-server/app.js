@@ -1,8 +1,12 @@
+// load environment variables as early as possible
+require('dotenv').config();
+
 var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+var cors = require("cors");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -13,6 +17,14 @@ var orderRouter = require("./routes/OrderRouter");
 var app = express();
 
 const db = require("./Loaders/Mongooes");
+
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -28,9 +40,9 @@ app.connect = db;
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/products", productRouter);
-app.use("/auth", authRouter);
-app.use("/orders", orderRouter);
+app.use("/api/products", productRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/orders", orderRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section className="bg-[rgba(242,240,241,1)]">
+    <section className="bg-[#fef8f8]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col lg:flex-row items-center">
         {/* Left Text */}
         <div className="flex-1 text-center lg:text-left space-y-6">
@@ -36,7 +36,7 @@ export default function Hero() {
         {/* Right Image */}
         <div className="flex-1 mt-10 lg:mt-0">
           <img
-            src="/banner2.jpg"
+            src="/mocan_banner.jpg"
             alt="Fashion Models"
             className="w-full h-663 max-w-md mx-auto lg:max-w-lg"
           />

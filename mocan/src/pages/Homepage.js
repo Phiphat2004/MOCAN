@@ -1,14 +1,12 @@
-import Navbar from '../components/Home/Navbar';
-import Banner   from '../components/Home/Banner';
+import Navbar from '../components/Navbar';
+import Banner from '../components/Home/Banner';
 import Topselling from '../components/Home/Topselling';
-import Footer from '../components/Home/Footer';
+import Footer from '../components/Footer';
 export default function Homepage() {
   return (
     <div>
-      <Navbar />
       <Banner />
       <Topselling />
-      <Footer />
     </div>
   );
 }

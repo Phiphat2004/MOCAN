@@ -84,15 +84,6 @@ export default function Footer() {
       {/* Bottom row */}
       <div className="max-w-7xl mx-auto mt-10 border-t pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
         <p>Shop.co © 2000-2023, All Rights Reserved</p>
-
-        {/* Payment methods */}
-        <div className="flex space-x-3 mt-4 md:mt-0">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" className="h-6" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Mastercard-logo.png" alt="Mastercard" className="h-6" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Apple_Pay_logo.svg" alt="ApplePay" className="h-6" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="GooglePay" className="h-6" />
-        </div>
       </div>
     </footer>
   );
