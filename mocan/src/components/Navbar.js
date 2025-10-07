@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   useEffect(() => {
@@ -34,12 +35,12 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16 ">
           {/* Logo */}
           <div className="text-4xl font-extrabold">
-            <span className="text-lime-700">MỘC AN</span>
+            <Link to="/" className="text-lime-700">MỘC AN</Link>
           </div>
 
           {/* Menu */}
           <div className="hidden md:flex space-x-6">
-            <div className="relative">
+            {/* <div className="relative">
               <button
                 id="shop-btn"
                 className="text-lime-700 flex items-center hover:text-orange-600"
@@ -60,7 +61,7 @@ export default function Navbar() {
                 </svg>
               </button>
               {/* Dropdown */}
-              <div
+            {/* <div
                 id="shop-menu"
                 className="hidden absolute mt-2 w-40 bg-white border rounded-lg shadow-lg"
               >
@@ -73,37 +74,65 @@ export default function Navbar() {
                 <a href="" className="block px-4 py-2 hover:bg-orange-600">
                   Kids
                 </a>
-              </div>
-            </div>
-            <a href="" className="text-lime-700 hover:text-orange-600">
+              </div> 
+            </div> */}
+            <Link to="/product" className="text-lime-700 hover:text-orange-600">
+              Shop
+            </Link>
+            <Link to="/sale" className="text-lime-700 hover:text-orange-600">
               On Sale
-            </a>
-            <a href="#" className="text-lime-700 hover:text-orange-600">
+            </Link>
+            <Link to="/new-arrivals" className="text-lime-700 hover:text-orange-600">
               New Arrivals
-            </a>
-            <a href="#" className="text-lime-700 hover:text-orange-600">
+            </Link>
+            <Link to="/brands" className="text-lime-700 hover:text-orange-600">
               Brands
-            </a>
+            </Link>
           </div>
 
-          {/* Mobile button */}
-          <div className="md:hidden">
-            <button id="mobile-btn" className="p-2 rounded-md focus:outline-none">
+          {/* Admin Login & Mobile button */}
+          <div className="flex items-center space-x-4">
+            {/* Admin Login Button */}
+            <button
+              onClick={() => {
+                window.location.href = "/login";
+              }}
+              className="hidden md:flex items-center px-4 py-2 bg-lime-700 text-white rounded-lg hover:bg-lime-800 transition-colors duration-200">
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
+                className="w-4 h-4 mr-2"
                 fill="none"
-                viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth="2"
+                viewBox="0 0 24 24"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
+                  strokeWidth="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
+              Admin Login
             </button>
+
+            {/* Mobile button */}
+            <div className="md:hidden">
+              <button id="mobile-btn" className="p-2 rounded-md focus:outline-none">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -122,6 +151,29 @@ export default function Navbar() {
         <a href="#" className="block px-3 py-2 hover:bg-orange-600">
           Brands
         </a>
+        {/* Admin Login for mobile */}
+        <div className="border-t border-gray-200 mt-2 pt-2">
+          <button
+            onClick={() => {
+              window.location.href = "/login";
+            }}
+            className="flex items-center w-full px-3 py-2 text-lime-700 hover:bg-lime-50 rounded-md">
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            Admin Login
+          </button>
+        </div>
       </div>
     </nav>
   );
