@@ -57,6 +57,21 @@ exports.createProduct = async (req, res) => {
       }
     }
 
+    // parse possible JSON-stringified fields (dimensions, colors, tags)
+    if (body.dimensions && typeof body.dimensions === 'string') {
+      try { body.dimensions = JSON.parse(body.dimensions); } catch (e) { /* leave as-is */ }
+    }
+    if (body.colors && typeof body.colors === 'string') {
+      try { body.colors = JSON.parse(body.colors); } catch (e) { body.colors = body.colors.split(',').map(s => s.trim()).filter(Boolean); }
+    }
+    if (body.tags && typeof body.tags === 'string') {
+      try { body.tags = JSON.parse(body.tags); } catch (e) { body.tags = body.tags.split(',').map(s => s.trim()).filter(Boolean); }
+    }
+
+    // coerce number fields if they are strings
+    if (body.price && typeof body.price === 'string') body.price = Number(body.price);
+    if (body.stock_quantity && typeof body.stock_quantity === 'string') body.stock_quantity = Number(body.stock_quantity);
+
     const product = new Product(body);
     const savedProduct = await product.save();
     res.status(201).json(savedProduct);
@@ -139,9 +154,16 @@ exports.updateProduct = async (req, res) => {
     }
 
     // update other fields (handle JSON-stringified values)
-    const fields = ['name', 'category', 'description', 'price', 'stock_quantity', 'manufacture_date', 'expiry_date', 'scent', 'skin_type'];
+    const fields = ['name', 'category', 'description', 'price', 'weight', 'stock_quantity', 'manufacture_date', 'expiry_date', 'scent', 'skin_type'];
     fields.forEach(k => {
-      if (body[k] !== undefined) product[k] = body[k];
+      if (body[k] !== undefined) {
+        // coerce numeric fields
+        if ((k === 'price' || k === 'stock_quantity' || k === 'weight') && typeof body[k] === 'string') {
+          product[k] = Number(body[k]);
+        } else {
+          product[k] = body[k];
+        }
+      }
     });
     if (body.dimensions) {
       try { product.dimensions = typeof body.dimensions === 'string' ? JSON.parse(body.dimensions) : body.dimensions; } catch (e) { }

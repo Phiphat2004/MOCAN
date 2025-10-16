@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { message } from 'antd';
 import axiosInstance from '../../utils/axiosConfig';
+import { useToast } from '../Toast/ToastProvider';
 
 export default function UpdateProductForm({ product, onSuccess, onCancel }) {
     const [colors, setColors] = useState(product?.colors || []);
@@ -37,6 +37,8 @@ export default function UpdateProductForm({ product, onSuccess, onCancel }) {
         setRemovedImages((s) => [...s, url]);
     };
 
+    const { addToast } = useToast();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -44,7 +46,7 @@ export default function UpdateProductForm({ product, onSuccess, onCancel }) {
             const form = new FormData(e.target);
             const body = {};
             // collect fields from form
-            ['name', 'category', 'description', 'price', 'stock_quantity', 'manufacture_date', 'expiry_date', 'scent', 'skin_type'].forEach(k => {
+            ['name', 'category', 'description', 'price', 'weight', 'stock_quantity', 'manufacture_date', 'expiry_date', 'scent', 'skin_type'].forEach(k => {
                 const v = form.get(k);
                 if (v !== null && v !== '') body[k] = v;
             });
@@ -76,12 +78,18 @@ export default function UpdateProductForm({ product, onSuccess, onCancel }) {
                 res = await axiosInstance.put(`/products/${product._id}`, body);
             }
 
-            message.success('Product updated successfully');
-            onSuccess && onSuccess(res.data);
+            // If parent supplied an onSuccess handler it will likely show feedback
+            // (e.g. ProductsList shows a toast). Avoid duplicate toasts by
+            // delegating success feedback to the parent when onSuccess exists.
+            if (onSuccess) {
+                onSuccess(res.data);
+            } else {
+                addToast('Cập nhật sản phẩm thành công', { type: 'success' });
+            }
         } catch (err) {
             console.error('Update product error', err);
             const text = err?.response?.data?.message || err?.message || 'Failed to update';
-            message.error(text);
+            addToast(text, { type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -97,7 +105,7 @@ export default function UpdateProductForm({ product, onSuccess, onCancel }) {
     }, [images]);
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-auto p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                     <label className="block text-sm">Name</label>
@@ -116,8 +124,24 @@ export default function UpdateProductForm({ product, onSuccess, onCancel }) {
                     <input name="price" type="number" defaultValue={product?.price} className="mt-1 block w-full border rounded px-3 py-2" />
                 </div>
                 <div>
+                    <label className="block text-sm">Weight (g)</label>
+                    <input name="weight" type="number" step="any" defaultValue={product?.weight ?? 0} className="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
                     <label className="block text-sm">Stock quantity</label>
                     <input name="stock_quantity" type="number" defaultValue={product?.stock_quantity} className="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label className="block text-sm">Length (cm)</label>
+                    <input name="length" type="number" step="any" defaultValue={product?.dimensions?.length ?? 0} className="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label className="block text-sm">Width (cm)</label>
+                    <input name="width" type="number" step="any" defaultValue={product?.dimensions?.width ?? 0} className="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label className="block text-sm">Height (cm)</label>
+                    <input name="height" type="number" step="any" defaultValue={product?.dimensions?.height ?? 0} className="mt-1 block w-full border rounded px-3 py-2" />
                 </div>
             </div>
 

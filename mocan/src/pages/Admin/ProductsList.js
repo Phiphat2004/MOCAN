@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Button, Space, Tag, Popconfirm, message } from 'antd';
+import { Table, Button, Space, Popconfirm } from 'antd';
 import AddProductModal from '../../components/Admin/AddProductModal';
 import UpdateProductModal from '../../components/Admin/UpdateProductModal';
 import axiosInstance from '../../utils/axiosConfig';
 import 'antd/dist/reset.css';
+import { useToast } from '../../components/Toast/ToastProvider';
 
 export default function ProductsList() {
     const [open, setOpen] = useState(false);
@@ -31,25 +32,26 @@ export default function ProductsList() {
         fetchProducts();
     }, [fetchProducts]);
 
+    const { addToast } = useToast();
+
     const handleSuccess = (created) => {
         setOpen(false);
         // refresh the list after successful creation
         fetchProducts();
         if (created?.name) {
             // small feedback
-            // eslint-disable-next-line no-alert
-            alert(`Created ${created.name}`);
+            addToast(`Tạo ${created.name} thành công`, { type: 'success' });
         }
     };
 
     const handleDelete = async (id) => {
         try {
             await axiosInstance.delete(`/products/${id}`);
-            message.success('Product deleted');
+            addToast('Đã xoá sản phẩm', { type: 'success' });
             fetchProducts();
         } catch (err) {
             console.error('Delete failed', err);
-            message.error(err?.response?.data?.message || 'Delete failed');
+            addToast(err?.response?.data?.message || 'Xoá thất bại', { type: 'error' });
         }
     };
 
@@ -147,7 +149,7 @@ export default function ProductsList() {
                         setEditOpen(false);
                         setSelected(null);
                         fetchProducts();
-                        message.success('Product updated');
+                        addToast('Cập nhật sản phẩm thành công', { type: 'success' });
                     }}
                 />
             )}

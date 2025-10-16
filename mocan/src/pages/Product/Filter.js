@@ -1,17 +1,33 @@
 import { useState } from "react";
 
-export default function Filter() {
+export default function Filter({ onApply, onChange }) {
 
     const [category, setCategory] = useState("All");
     const [price, setPrice] = useState("Default");
-    const [color, setColor] = useState("#000000"); // mặc định màu đen
 
-
-    const handleFilter = () => {
-        // Xử lý filter ở đây
-        console.log("Filter applied:", { category, price, color });
-        alert(`Category: ${category}\nPrice: ${price}\nColor: ${color}`);
+    const handleCategoryClick = (c) => {
+        setCategory(c);
+        if (onChange) onChange({ category: c, price });
     };
+
+    const handlePriceClick = (p) => {
+        setPrice(p);
+        if (onChange) onChange({ category, price: p });
+    };
+
+    const handleApply = () => {
+        if (onApply) onApply({ category, price });
+    };
+
+    const handleReset = () => {
+        const defaultCategory = 'All';
+        const defaultPrice = 'Default';
+        setCategory(defaultCategory);
+        setPrice(defaultPrice);
+        if (onChange) onChange({ category: defaultCategory, price: defaultPrice });
+        if (onApply) onApply({ category: defaultCategory, price: defaultPrice });
+    };
+
     return (
         <div className="space-y-6 border p-4 rounded-lg shadow">
             <h1 className="font-bold text-2xl">Filter</h1>
@@ -20,10 +36,10 @@ export default function Filter() {
             <div>
                 <h2 className="font-semibold mb-2 text-2xl">Category</h2>
                 <div className="flex flex-col gap-3">
-                    {["All", "Men", "Women", "Kids"].map((c) => (
+                    {["All", "Men", "Women", "Kid"].map((c) => (
                         <button
                             key={c}
-                            onClick={() => setCategory(c)}
+                            onClick={() => handleCategoryClick(c)}
                             className={`px-3 py-1 rounded ${category === c ? "bg-lime-700 text-white" : "bg-gray-200"
                                 }`}
                         >
@@ -40,7 +56,7 @@ export default function Filter() {
                     {["Default", "From low to high", "From high to low"].map((p) => (
                         <button
                             key={p}
-                            onClick={() => setPrice(p)}
+                            onClick={() => handlePriceClick(p)}
                             className={`px-3 py-1 rounded ${price === p ? "bg-lime-700 text-white" : "bg-gray-200"
                                 }`}
                         >
@@ -50,24 +66,20 @@ export default function Filter() {
                 </div>
             </div>
             <hr />
-            {/* Color */}
-            <div>
-                <h2 className="font-semibold mb-2 text-2xl">Color</h2>
-                <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => setColor(e.target.value)}
-                    className="w-20 h-12 border rounded cursor-pointer"
-                />
-            </div>
 
             {/* Nút Filter */}
-            <div className="pt-4">
+            <div className="pt-4 flex gap-3">
                 <button
-                    onClick={handleFilter}
-                    className="w-full bg-lime-600 text-white py-2 rounded-lg hover:bg-lime-700"
+                    onClick={handleApply}
+                    className="flex-1 bg-lime-600 text-white py-2 rounded-lg hover:bg-lime-700"
                 >
                     Apply Filter
+                </button>
+                <button
+                    onClick={handleReset}
+                    className="flex-1 bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400"
+                >
+                    Reset
                 </button>
             </div>
         </div>

@@ -1,6 +1,3 @@
-import React from 'react';
-import AdminSidebar from '../../components/Admin/AdminSidebar';
-
 export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-lime-50">

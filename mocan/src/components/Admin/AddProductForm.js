@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../utils/axiosConfig';
-import { message } from 'antd';
+import { useToast } from '../Toast/ToastProvider';
 
 export default function AddProductForm({ onSuccess, onCancel }) {
     const [colors, setColors] = useState([]);
@@ -33,6 +33,8 @@ export default function AddProductForm({ onSuccess, onCancel }) {
     };
     const removeImage = (idx) => setImages((s) => s.filter((_, i) => i !== idx));
 
+    const { addToast } = useToast();
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         setLoading(true);
@@ -53,6 +55,7 @@ export default function AddProductForm({ onSuccess, onCancel }) {
                     width: Number(formData.get('width')) || 0,
                     height: Number(formData.get('height')) || 0,
                 },
+                stock_quantity: Number(formData.get('stock_quantity')) || 0,
                 skin_type: formData.get('skin_type') || '',
                 colors,
                 scent: formData.get('scent') || '',
@@ -79,12 +82,12 @@ export default function AddProductForm({ onSuccess, onCancel }) {
                 const res = await axiosInstance.post('/products', fd, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
-                message.success(`Created ${res.data?.name || 'product'}`);
-                onSuccess && onSuccess(res.data);
+                if (onSuccess) onSuccess(res.data);
+                else addToast(`Tạo sản phẩm ${res.data?.name || 'thành công'}`, { type: 'success' });
             } else {
                 const res = await axiosInstance.post('/products', product);
-                message.success(`Created ${res.data?.name || 'product'}`);
-                onSuccess && onSuccess(res.data);
+                if (onSuccess) onSuccess(res.data);
+                else addToast(`Tạo sản phẩm ${res.data?.name || 'thành công'}`, { type: 'success' });
             }
             // clean
             images.forEach((f) => { if (f && f.preview) URL.revokeObjectURL(f.preview); });
@@ -94,14 +97,14 @@ export default function AddProductForm({ onSuccess, onCancel }) {
             event.target.reset();
         } catch (err) {
             console.error('Create product error', err);
-            alert(err.response?.data?.message || err.message || 'Failed to create product');
+            addToast(err.response?.data?.message || err.message || 'Tạo sản phẩm thất bại', { type: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-auto p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                     <label className="block text-sm">Name</label>
@@ -124,8 +127,24 @@ export default function AddProductForm({ onSuccess, onCancel }) {
                     <input name="price" type="number" className="mt-1 block w-full border rounded px-3 py-2" />
                 </div>
                 <div>
+                    <label className="block text-sm">Weight (g)</label>
+                    <input name="weight" type="number" step="any" className="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
                     <label className="block text-sm">Stock quantity</label>
                     <input name="stock_quantity" type="number" className="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label className="block text-sm">Length (cm)</label>
+                    <input name="length" type="number" step="any" className="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label className="block text-sm">Width (cm)</label>
+                    <input name="width" type="number" step="any" className="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label className="block text-sm">Height (cm)</label>
+                    <input name="height" type="number" step="any" className="mt-1 block w-full border rounded px-3 py-2" />
                 </div>
             </div>
 
