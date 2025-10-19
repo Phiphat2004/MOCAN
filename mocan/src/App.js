@@ -24,8 +24,8 @@ function AppContent() {
       {!isAdmin && <Navbar />}
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/product" element={<ProductPage />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/products" element={<ProductPage />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/login" element={<LoginPage />} />
 

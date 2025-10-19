@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { addToCart } from '../utils/cart';
 import { useToast } from './Toast/ToastProvider';
+import formatVND from '../utils/formatPrice';
 
 export default function ProductCard({ product }) {
     const stock = typeof product.stock_quantity !== 'undefined' ? product.stock_quantity : (product.stock || 0);
@@ -24,10 +25,10 @@ export default function ProductCard({ product }) {
     };
 
     return (
-        <Link to={`/product/${product.id}`} className="block">
+        <Link to={`/products/${product.id}`} className="block">
             <div
                 key={product.id}
-                className="bg-white border border-gray-200 rounded-2xl p-3 flex flex-col items-center shadow-sm hover:shadow-xl transform hover:-translate-y-1 transition-all w-44 sm:w-48 md:w-52"
+                className="bg-white border border-gray-200 rounded-2xl p-3 flex flex-col items-center shadow-sm hover:shadow-xl transform hover:-translate-y-1 transition-all w-44 sm:w-44 md:w-60 md:h-[320px]"
             >
                 {stock <= 0 && (
                     <div className="absolute mt-2 ml-2 px-2 py-1 bg-red-600 text-white text-xs rounded">Hết hàng</div>
@@ -40,13 +41,13 @@ export default function ProductCard({ product }) {
                 />
 
                 {/* Name - emphasized */}
-                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 whitespace-normal break-words text-center">
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 whitespace-normal break-words px-3 text-start">
                     {product.name}
                 </h3>
 
                 {/* Price */}
-                <div className="w-full flex items-center justify-center mt-auto px-3">
-                    <div className="text-sm md:text-base font-bold text-lime-700">{product.price ? new Intl.NumberFormat('vi-VN').format(product.price) + ' VNĐ' : '0 VNĐ'}</div>
+                <div className="w-full flex items-center mt-auto px-3">
+                    <div className="text-sm md:text-base font-bold text-lime-700">{formatVND(product.price)}</div>
                 </div>
 
                 {/* Add to cart full width button */}

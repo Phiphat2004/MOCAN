@@ -5,6 +5,7 @@ import UpdateProductModal from '../../components/Admin/UpdateProductModal';
 import axiosInstance from '../../utils/axiosConfig';
 import 'antd/dist/reset.css';
 import { useToast } from '../../components/Toast/ToastProvider';
+import formatVND from '../../utils/formatPrice';
 
 export default function ProductsList() {
     const [open, setOpen] = useState(false);
@@ -103,7 +104,7 @@ export default function ProductsList() {
                                     title: 'Price',
                                     dataIndex: 'price',
                                     key: 'price',
-                                    render: (price) => price?.toLocaleString?.() ?? price,
+                                    render: (price) => formatVND(price),
                                 },
                                 {
                                     title: 'Category',

@@ -32,8 +32,12 @@ export default function ProductPage() {
                     discount: p.discount || null,
                     rating: (typeof p.rating === 'number') ? p.rating : (p.rating ? Number(p.rating) : 0),
                 }));
-                setAllProducts(mapped);
-                setProducts(mapped);
+                // place in-stock products first, out-of-stock last
+                const inStock = mapped.filter(p => (p.stock_quantity ?? 0) > 0);
+                const outStock = mapped.filter(p => (p.stock_quantity ?? 0) <= 0);
+                const grouped = [...inStock, ...outStock];
+                setAllProducts(grouped);
+                setProducts(grouped);
             } catch (err) {
                 console.error('Failed to fetch products', err);
                 const text = err?.response?.data?.message || err?.message || 'Failed to load products';
@@ -80,7 +84,10 @@ export default function ProductPage() {
             filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
         }
 
-        setProducts(filtered);
+        // ensure in-stock items appear first while preserving the ordering within each group
+        const inStock = filtered.filter(p => (p.stock_quantity ?? 0) > 0);
+        const outStock = filtered.filter(p => (p.stock_quantity ?? 0) <= 0);
+        setProducts([...inStock, ...outStock]);
     };
 
     return (

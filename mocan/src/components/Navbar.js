@@ -50,7 +50,7 @@ export default function Navbar() {
 
           {/* Menu */}
           <div className="hidden md:flex space-x-6">
-            <Link to="/product" className="text-lime-700 hover:text-orange-600">Shop</Link>
+            <Link to="/products" className="text-lime-700 hover:text-orange-600">Shop</Link>
             <Link to="/sale" className="text-lime-700 hover:text-orange-600">On Sale</Link>
             <Link to="/new-arrivals" className="text-lime-700 hover:text-orange-600">New Arrivals</Link>
             <Link to="/brands" className="text-lime-700 hover:text-orange-600">Brands</Link>
