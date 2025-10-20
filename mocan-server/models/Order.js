@@ -3,6 +3,7 @@ const OrderSchema = new mongoose.Schema(
   {
     order_date: { type: Date, default: Date.now },
     total_amount: { type: Number, required: true },
+    note: { type: String },
     payment_method: {
       type: String,
       enum: ["COD", "Momo", "Chuyển khoản"],

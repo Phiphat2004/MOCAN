@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosConfig';
 import { addToCart } from '../../utils/cart';
 import { useToast } from '../../components/Toast/ToastProvider';
+import formatVND from '../../utils/formatPrice';
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -50,7 +51,7 @@ export default function ProductDetail() {
     return (
         <div className="p-6 max-w-5xl mx-auto">
             <div className="mb-4">
-                <Link to="/product" aria-label="Back to products" className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-lime-700 text-lime-700 rounded shadow-sm hover:bg-lime-700 hover:text-white transition">
+                <Link to="/products" aria-label="Back to products" className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-lime-700 text-lime-700 rounded shadow-sm hover:bg-lime-700 hover:text-white transition">
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -83,33 +84,33 @@ export default function ProductDetail() {
 
                 <div className="md:w-1/2 bg-white p-6 rounded shadow">
                     <h1 className="text-2xl font-bold mb-2">{name}</h1>
-                    <div className="text-xl text-black font-semibold mb-4">${price}</div>
+                    <div className="text-xl text-black font-semibold mb-4">{formatVND(price)}</div>
 
-                    <p className="text-gray-700 mb-4">{description || 'No description provided.'}</p>
+                    <p className=" mb-4">Mô tả: <span className="text-gray-700">{description || 'No description provided.'}</span></p>
 
                     <div className="mb-2">
-                        <span className="font-medium">Status: </span>
+                        <span className="font-medium">Trạng thái: </span>
                         <span className={`text-sm ${inStock ? 'text-green-600' : 'text-red-600'}`}>{statusText}</span>
                     </div>
 
                     <div className="mb-2">
-                        <span className="font-medium">Stock: </span>
+                        <span className="font-medium">Số lượng trong kho: </span>
                         <span className="text-sm text-gray-700">{stock_quantity ?? 'N/A'}</span>
                     </div>
 
                     <div className="mb-2">
-                        <span className="font-medium">Category: </span>
+                        <span className="font-medium">Danh mục: </span>
                         <span className="text-sm text-gray-700">{category || 'N/A'}</span>
                     </div>
 
                     <div className="mt-4">
-                        <h3 className="font-medium">Dimensions</h3>
+                        <h3 className="font-medium">Kích thước</h3>
                         <div className="text-sm text-gray-700">
-                            Length: {dimensions.length ?? 0} | Width: {dimensions.width ?? 0} | Height: {dimensions.height ?? 0}
+                            Chiều dài: {dimensions.length ?? 0} | Chiều rộng: {dimensions.width ?? 0} | Chiều cao: {dimensions.height ?? 0}
                         </div>
                     </div>
 
-                    <div className="mt-4 text-xs text-gray-500">Created: {createdAt ? new Date(createdAt).toLocaleString() : 'N/A'}</div>
+                    <div className="mt-4 text-xs text-gray-500">Ngày tạo: {createdAt ? new Date(createdAt).toLocaleString() : 'N/A'}</div>
                     {/* Quantity & Add to Cart */}
                     <div className="mt-6 flex items-center gap-4">
                         <div className="flex items-center border rounded">

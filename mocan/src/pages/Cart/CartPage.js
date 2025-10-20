@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axiosInstance from '../../utils/axiosConfig';
 import { getCart, updateCartItem, removeFromCart, clearCart } from '../../utils/cart';
+import { useToast } from '../../components/Toast/ToastProvider';
+import formatVND from '../../utils/formatPrice';
 
 export default function CartPage() {
     const [items, setItems] = useState([]);
+    const [checkoutOpen, setCheckoutOpen] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [guest, setGuest] = useState({ name: '', phone: '', email: '', address: '', note: '' });
+    const { addToast } = useToast();
 
     useEffect(() => {
         setItems(getCart());
@@ -24,6 +31,42 @@ export default function CartPage() {
         setItems([]);
     };
 
+    const openCheckout = () => setCheckoutOpen(true);
+    const closeCheckout = () => setCheckoutOpen(false);
+
+    const submitOrder = async (e) => {
+        e.preventDefault();
+        if (submitting) return; // prevent double submit
+
+        // build order payload
+        const cartItems = getCart();
+        if (!cartItems || cartItems.length === 0) {
+            addToast('Giỏ hàng rỗng', { type: 'error' });
+            return;
+        }
+
+        const order_detail = cartItems.map(it => ({ product_id: it.id, quantity: it.quantity, unit_price: it.price }));
+        const payload = {
+            guest: { name: guest.name, phone: guest.phone, email: guest.email || '', address: guest.address, note: guest.note },
+            order_detail,
+            payment_method: 'COD'
+        };
+
+        try {
+            setSubmitting(true);
+            await axiosInstance.post('/orders', payload);
+            addToast('Đặt hàng thành công, thông tin về đơn hàng đã được gửi về email của bạn.', { type: 'success' });
+            clearCart();
+            setItems([]);
+            closeCheckout();
+        } catch (err) {
+            console.error('Order failed', err);
+            addToast(err?.response?.data?.message || 'Đặt hàng thất bại', { type: 'error' });
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     const total = items.reduce((s, it) => s + (it.price || 0) * (it.quantity || 0), 0);
 
     if (!items || items.length === 0) return (
@@ -31,7 +74,7 @@ export default function CartPage() {
             <h2 className="text-2xl font-bold mb-4">Your cart</h2>
             <p>Your cart is empty.</p>
             <div className="mt-4">
-                <Link to="/product" className="text-blue-600">Continue shopping</Link>
+                <Link to="/products" className="text-lime-800 underline">Continue shopping</Link>
             </div>
         </div>
     );
@@ -46,19 +89,19 @@ export default function CartPage() {
                             <img src={it.image} alt={it.name} className="w-20 h-20 object-contain" />
                             <div>
                                 <div className="font-medium">{it.name}</div>
-                                <div className="text-sm text-gray-600">${it.price}</div>
+                                <div className="text-sm text-gray-600">{formatVND(it.price)}</div>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <button onClick={() => onQtyChange(it.id, (it.quantity || 1) - 1)} className="px-2 py-1 border rounded">-</button>
+                            <button onClick={() => onQtyChange(it.id, (it.quantity || 1) - 1)} className="px-2 py-1 border rounded" disabled={submitting}>-</button>
                             <div className="px-3">{it.quantity}</div>
                             <button
                                 onClick={() => onQtyChange(it.id, (it.quantity || 1) + 1)}
                                 className="px-2 py-1 border rounded"
-                                disabled={typeof it.stock === 'number' ? ((it.quantity || 0) >= it.stock) : false}
+                                disabled={submitting || (typeof it.stock === 'number' ? ((it.quantity || 0) >= it.stock) : false)}
                             >+</button>
-                            <button onClick={() => onRemove(it.id)} className="ml-4 text-red-600">Remove</button>
+                            <button onClick={() => onRemove(it.id)} className="ml-4 text-red-600" disabled={submitting}>Remove</button>
                             {typeof it.stock === 'number' && (
                                 <div className="ml-4 text-sm text-gray-500">Stock: {it.stock}</div>
                             )}
@@ -72,12 +115,56 @@ export default function CartPage() {
                     <button onClick={onClear} className="px-4 py-2 bg-gray-100 border rounded">Clear cart</button>
                 </div>
                 <div className="text-right">
-                    <div className="text-lg font-semibold">Total: ${total.toFixed(2)}</div>
+                    <div className="text-lg font-semibold">Total: {formatVND(total)}</div>
                     <div className="mt-2">
-                        <button className="px-4 py-2 bg-lime-700 text-white rounded">Checkout (demo)</button>
+                        <button onClick={openCheckout} className="px-4 py-2 bg-lime-700 text-white rounded">Checkout</button>
                     </div>
                 </div>
             </div>
+
+            {/* Checkout modal */}
+            {checkoutOpen && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-auto">
+                        <h3 className="text-lg font-semibold mb-4">Thông tin người nhận</h3>
+                        <form onSubmit={submitOrder} className="space-y-3">
+                            <div>
+                                <label className="block text-sm">Họ tên</label>
+                                <input required value={guest.name} onChange={e => setGuest({ ...guest, name: e.target.value })} className="mt-1 block w-full border rounded px-3 py-2" />
+                            </div>
+                            <div>
+                                <label className="block text-sm">Số điện thoại</label>
+                                <input required value={guest.phone} onChange={e => setGuest({ ...guest, phone: e.target.value })} className="mt-1 block w-full border rounded px-3 py-2" />
+                            </div>
+                            <div>
+                                <label className="block text-sm">Email (tuỳ chọn)</label>
+                                <input value={guest.email} onChange={e => setGuest({ ...guest, email: e.target.value })} className="mt-1 block w-full border rounded px-3 py-2" />
+                            </div>
+                            <div>
+                                <label className="block text-sm">Địa chỉ giao hàng</label>
+                                <input required value={guest.address} onChange={e => setGuest({ ...guest, address: e.target.value })} className="mt-1 block w-full border rounded px-3 py-2" />
+                            </div>
+                            <div>
+                                <label className="block text-sm">Ghi chú (nếu có)</label>
+                                <textarea value={guest.note} onChange={e => setGuest({ ...guest, note: e.target.value })} className="mt-1 block w-full border rounded px-3 py-2" />
+                            </div>
+
+                            <div className="flex justify-end gap-2">
+                                <button type="button" onClick={closeCheckout} className="px-4 py-2 border rounded" disabled={submitting}>Cancel</button>
+                                <button type="submit" className="px-4 py-2 bg-lime-700 text-white rounded flex items-center gap-2" disabled={submitting}>
+                                    {submitting ? (
+                                        <svg className="w-4 h-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                        </svg>
+                                    ) : null}
+                                    {submitting ? 'Đang xử lý...' : 'Place order'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

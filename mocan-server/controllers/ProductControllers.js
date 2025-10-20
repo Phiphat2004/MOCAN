@@ -1,4 +1,5 @@
 const Product = require("../models/Product"); // import model Product
+const Order = require("../models/Order");
 const cloudinary = require('../configurations/cloundinaryConfig');
 
 // helper to upload a buffer to Cloudinary using upload_stream
@@ -190,6 +191,59 @@ exports.deleteProduct = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
     res.status(200).json({ message: "Đã xóa sản phẩm thành công" });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+// Lấy top-selling products (top 4) by aggregating Order.order_detail.quantity
+exports.getTopSelling = async (req, res) => {
+  try {
+    // aggregate total quantity sold per product_id
+    const pipeline = [
+      { $unwind: "$order_detail" },
+      {
+        $group: {
+          _id: "$order_detail.product_id",
+          totalSold: { $sum: "$order_detail.quantity" },
+        },
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 4 },
+      // convert string product id to ObjectId for lookup (if product_id is stored as string)
+      { $addFields: { productObjectId: { $toObjectId: "$_id" } } },
+      {
+        $lookup: {
+          from: "products",
+          localField: "productObjectId",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      { $unwind: { path: "$product", preserveNullAndEmptyArrays: false } },
+      // project only fields client needs (including description)
+      {
+        $project: {
+          _id: 0,
+          totalSold: 1,
+          product: {
+            _id: "$product._id",
+            name: "$product.name",
+            images: "$product.images",
+            image: { $arrayElemAt: ["$product.images", 0] },
+            description: "$product.description",
+            price: "$product.price",
+            stock_quantity: "$product.stock_quantity",
+          },
+        },
+      },
+    ];
+
+    const results = await Order.aggregate(pipeline);
+    // return array of { product, totalSold }
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("getTopSelling error", err);
     res.status(500).json({ error: err.message });
   }
 };
