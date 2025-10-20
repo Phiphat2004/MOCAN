@@ -5,9 +5,9 @@ export default function Footer() {
 
         {/* Logo + text */}
         <div className="md:col-span-2">
-          <h2 className="text-2xl font-extrabold mb-4">SHOP.CO</h2>
+          <h2 className="text-2xl font-extrabold mb-4">ECOSOAP.CO</h2>
           <p className="text-sm text-gray-600 mb-4">
-            We have clothes that suits your style and which you&apos;re proud to wear.
+            We have soaps that suit your style and which you&apos;re proud to use.
             From women to men.
           </p>
 

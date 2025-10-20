@@ -45,7 +45,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16 ">
           {/* Logo */}
           <div className="text-4xl font-extrabold">
-            <Link to="/" className="text-lime-700">MỘC AN</Link>
+            <Link to="/" className="text-lime-700">ECO SOAP</Link>
           </div>
 
           {/* Menu */}
