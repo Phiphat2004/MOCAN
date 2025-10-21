@@ -112,7 +112,12 @@ export default function AddProductForm({ onSuccess, onCancel }) {
                 </div>
                 <div>
                     <label className="block text-sm">Category</label>
-                    <input name="category" className="mt-1 block w-full border rounded px-3 py-2" />
+                    <select name="category" required className="mt-1 block w-full border rounded px-3 py-2">
+                        <option value="">Select category</option>
+                        <option value="Men">Men</option>
+                        <option value="Women">Women</option>
+                        <option value="Kid">Kid</option>
+                    </select>
                 </div>
                 <div className="md:col-span-2">
                     <label className="block text-sm">Description</label>
