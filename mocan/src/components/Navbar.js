@@ -1,105 +1,213 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { cartCount } from '../utils/cart';
+import { cartCount } from "../utils/cart";
 
 export default function Navbar() {
   const [count, setCount] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
-    const shopBtn = document.getElementById("shop-btn");
-    const shopMenu = document.getElementById("shop-menu");
-    const mobileBtn = document.getElementById("mobile-btn");
-    const mobileMenu = document.getElementById("mobile-menu");
-
-    const toggleShop = (e) => {
-      e.stopPropagation();
-      if (shopMenu) shopMenu.classList.toggle("hidden");
-    };
-
-    const toggleMobile = (e) => {
-      e.stopPropagation();
-      if (mobileMenu) mobileMenu.classList.toggle("hidden");
-    };
-
-    if (shopBtn) shopBtn.addEventListener("click", toggleShop);
-    if (mobileBtn) mobileBtn.addEventListener("click", toggleMobile);
-
     const updateCount = () => {
-      try { setCount(cartCount()); } catch (e) { setCount(0); }
+      try {
+        setCount(cartCount());
+      } catch (e) {
+        setCount(0);
+      }
     };
 
     updateCount();
-    window.addEventListener('cart_updated', updateCount);
+    window.addEventListener("cart_updated", updateCount);
 
-    // cleanup
-    return () => {
-      if (shopBtn) shopBtn.removeEventListener("click", toggleShop);
-      if (mobileBtn) mobileBtn.removeEventListener("click", toggleMobile);
-      window.removeEventListener('cart_updated', updateCount);
+    // Đóng mobile menu khi click ra ngoài
+    const handleClickOutside = (event) => {
+      if (
+        isOpen &&
+        !event.target.closest("#mobile-menu") &&
+        !event.target.closest("#mobile-btn")
+      ) {
+        setIsOpen(false);
+      }
     };
-  }, []);
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("cart_updated", updateCount);
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
-    <nav className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16 ">
+      <nav className="bg-white shadow-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <div className="text-4xl font-extrabold">
-            <Link to="/" className="text-lime-700">ECO SOAP</Link>
+          <div className="flex-shrink-0">
+            <Link to="/" className="flex items-center space-x-2">
+              <img
+                src="/assets/logo.jpg"
+                alt="Ecosoap Logo"
+                className="h-12 w-auto"
+              />
+              <span className="text-2xl font-bold text-lime-700 tracking-tight">
+                ECO SOAP
+              </span>
+            </Link>
           </div>
 
-          {/* Menu */}
-          <div className="hidden md:flex space-x-6">
-            <Link to="/products" className="text-lime-700 hover:text-orange-600">Shop</Link>
-            <Link to="/sale" className="text-lime-700 hover:text-orange-600">On Sale</Link>
-            <Link to="/new-arrivals" className="text-lime-700 hover:text-orange-600">New Arrivals</Link>
-            <Link to="/brands" className="text-lime-700 hover:text-orange-600">Brands</Link>
-          </div>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              to="/products" onClick={scrollToTop}
+              className="text-gray-600 hover:text-lime-700 font-medium transition-colors"
+            >
+              Sản phẩm
+            </Link>
+            <Link
+              to="/about" onClick={scrollToTop}
+              className="text-gray-600 hover:text-lime-700 font-medium transition-colors"
+            >
+              Giới thiệu
+            </Link>
+            <Link
+              to="/company-products" onClick={scrollToTop}
+              className="text-gray-600 hover:text-lime-700 font-medium transition-colors"
+            >
+              Về chúng tôi
+            </Link>
+            <Link
+              to="/support"  onClick={scrollToTop}
+              className="text-gray-600 hover:text-lime-700 font-medium transition-colors"
+            >
+              Hỗ trợ
+            </Link>
 
-          <div className="flex items-center space-x-4">
-            {/* Cart icon */}
-            <Link to="/cart" className="relative hidden md:flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-lime-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6m0 0a1 1 0 001 1h12a1 1 0 001-1l1.2-6M7 13h10" />
+            {/* Cart Icon */}
+            <Link
+              to="/cart" 
+              className="relative p-2 text-gray-600 hover:text-lime-700 transition-colors"
+              aria-label="Giỏ hàng"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
               </svg>
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">{count}</span>
+              {count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {count}
+                </span>
+              )}
             </Link>
 
             {/* Admin Login Button */}
-            <button
-              onClick={() => { window.location.href = "/login"; }}
-              className="hidden md:flex items-center px-4 py-2 bg-lime-700 text-white rounded-lg hover:bg-lime-800 transition-colors duration-200">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              Admin Login
-            </button>
+            <Link
+              to="/login"
+              className="bg-lime-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-lime-700 transition-colors"
+            >
+              Đăng nhập
+            </Link>
+          </div>
 
-            {/* Mobile button */}
-            <div className="md:hidden">
-              <button id="mobile-btn" className="p-2 rounded-md focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              id="mobile-btn"
+              className="p-2 rounded-md text-gray-600 hover:text-lime-700 hover:bg-gray-100 focus:outline-none"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <span className="sr-only">Mở menu</span>
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                {isOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Mobile menu */}
-      <div id="mobile-menu" className="md:hidden hidden px-4 pb-4">
-        <Link to="/product" className="block px-3 py-2 hover:bg-orange-600">Shop</Link>
-        <Link to="/sale" className="block px-3 py-2 hover:bg-orange-600">On Sale</Link>
-        <Link to="/new-arrivals" className="block px-3 py-2 hover:bg-orange-600">New Arrivals</Link>
-        <Link to="/brands" className="block px-3 py-2 hover:bg-orange-600">Brands</Link>
-        <div className="border-t border-gray-200 mt-2 pt-2">
-          <button onClick={() => { window.location.href = "/login"; }} className="flex items-center w-full px-3 py-2 text-lime-700 hover:bg-lime-50 rounded-md">
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            Admin Login
-          </button>
+      <div
+        id="mobile-menu"
+        className={`md:hidden transition-all duration-300 ease-in-out ${
+          isOpen ? "max-h-screen" : "max-h-0 overflow-hidden"
+        }`}
+      >
+        <div className="px-4 pt-2 pb-4 space-y-2 bg-white">
+          <Link
+            to="/products"
+            className="block px-4 py-3 text-gray-600 hover:text-lime-700 hover:bg-gray-50 rounded-lg font-medium"
+          >
+            Sản phẩm
+          </Link>
+          <Link
+            to="/about"
+            className="block px-4 py-3 text-gray-600 hover:text-lime-700 hover:bg-gray-50 rounded-lg font-medium"
+          >
+            Giới thiệu
+          </Link>
+          <Link
+            to="/company-products"
+            className="block px-4 py-3 text-gray-600 hover:text-lime-700 hover:bg-gray-50 rounded-lg font-medium"
+          >
+            Về chúng tôi
+          </Link>
+          <Link
+            to="/support"
+            className="block px-4 py-3 text-gray-600 hover:text-lime-700 hover:bg-gray-50 rounded-lg font-medium"
+          >
+            Hỗ trợ
+          </Link>
+
+          {/* Mobile Cart Link */}
+          <Link
+            to="/cart"
+            className="block px-4 py-3 text-gray-600 hover:text-lime-700 hover:bg-gray-50 rounded-lg font-medium"
+          >
+            Giỏ hàng {count > 0 && `(${count})`}
+          </Link>
+
+          <div className="pt-2">
+            <Link
+              to="/login"
+              className="block w-full px-4 py-3 text-center bg-lime-600 text-white rounded-lg font-medium hover:bg-lime-700 transition-colors"
+            >
+              Đăng nhập
+            </Link>
+          </div>
         </div>
       </div>
     </nav>

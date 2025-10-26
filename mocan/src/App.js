@@ -4,7 +4,21 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import ProductPage from './pages/Product/ProductPage';
 import ProductDetail from './pages/Product/ProductDetail';
 import CartPage from './pages/Cart/CartPage';
+
+import AboutPage from './pages/Company/AboutPage';
+import FeaturesPage from './pages/Company/FeaturesPage';
+import CompanyProductsPage from './pages/Company/CompanyProductsPage';
 import Navbar from './components/Navbar';
+
+// Help Pages
+import CustomerSupport from './pages/Support/CustomerSupport';
+import DeliveryDetails from './pages/Support/DeliveryDetails';
+import TermsAndConditions from './pages/Support/TermsAndConditions';
+import PrivacyPolicy from './pages/Support/PrivacyPolicy';
+import AccountFAQ from './pages/FAQ/AccountFAQ';
+import DeliveryFAQ from './pages/FAQ/DeliveryFAQ';
+import OrderFAQ from './pages/FAQ/OrderFAQ';
+import PaymentFAQ from './pages/FAQ/PaymentFAQ';
 import Footer from './components/Footer';
 import LoginPage from './pages/Auth/LoginPage';
 import AdminLayout from './components/Admin/AdminLayout';
@@ -24,8 +38,23 @@ function AppContent() {
         <Route path="/" element={<Homepage />} />
         <Route path="/products" element={<ProductPage />} />
         <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
+        <Route path="/company-products" element={<CompanyProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/login" element={<LoginPage />} />
+        
+        {/* Help Routes */}
+        <Route path="/support" element={<CustomerSupport />} />
+        <Route path="/delivery-info" element={<DeliveryDetails />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        
+        {/* FAQ Routes */}
+        <Route path="/faq/account" element={<AccountFAQ />} />
+        <Route path="/faq/delivery" element={<DeliveryFAQ />} />
+        <Route path="/faq/orders" element={<OrderFAQ />} />
+        <Route path="/faq/payment" element={<PaymentFAQ />} />
 
         {/* Admin routes (use AdminLayout to show sidebar on all admin pages) */}
         <Route path="/admin" element={<AdminLayout />}>
