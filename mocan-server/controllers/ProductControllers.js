@@ -58,10 +58,6 @@ exports.createProduct = async (req, res) => {
       }
     }
 
-    // parse possible JSON-stringified fields (dimensions, colors, tags)
-    if (body.dimensions && typeof body.dimensions === 'string') {
-      try { body.dimensions = JSON.parse(body.dimensions); } catch (e) { /* leave as-is */ }
-    }
     if (body.colors && typeof body.colors === 'string') {
       try { body.colors = JSON.parse(body.colors); } catch (e) { body.colors = body.colors.split(',').map(s => s.trim()).filter(Boolean); }
     }
@@ -73,6 +69,9 @@ exports.createProduct = async (req, res) => {
     if (body.price && typeof body.price === 'string') body.price = Number(body.price);
     if (body.stock_quantity && typeof body.stock_quantity === 'string') body.stock_quantity = Number(body.stock_quantity);
 
+    if (body.size && typeof body.size === 'string') {
+      try { body.size = JSON.parse(body.size); } catch (e) { }
+    }
     const product = new Product(body);
     const savedProduct = await product.save();
     res.status(201).json(savedProduct);
@@ -168,6 +167,9 @@ exports.updateProduct = async (req, res) => {
     });
     if (body.dimensions) {
       try { product.dimensions = typeof body.dimensions === 'string' ? JSON.parse(body.dimensions) : body.dimensions; } catch (e) { }
+    }
+    if (body.size) {
+      try { product.size = typeof body.size === 'string' ? JSON.parse(body.size) : body.size; } catch (e) { }
     }
     if (body.colors) {
       try { product.colors = typeof body.colors === 'string' ? JSON.parse(body.colors) : body.colors; } catch (e) { }

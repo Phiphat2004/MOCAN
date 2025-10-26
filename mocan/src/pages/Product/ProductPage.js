@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Filter from './Filter';
 import ProductCard from '../../components/ProductCard';
+import { addToCart } from '../../utils/cart';
+import { useToast } from '../../components/Toast/ToastProvider';
 import axiosInstance from '../../utils/axiosConfig';
 
 
@@ -9,6 +11,12 @@ export default function ProductPage() {
     const [allProducts, setAllProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [quickOpen, setQuickOpen] = useState(false);
+    const [quickProduct, setQuickProduct] = useState(null);
+    const [qpColor, setQpColor] = useState('');
+    const [qpSize, setQpSize] = useState('');
+    const [qpQty, setQpQty] = useState(1);
+    const { addToast } = useToast();
 
     useEffect(() => {
         let mounted = true;
@@ -26,6 +34,8 @@ export default function ProductPage() {
                     image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : (p.image || '/assets/Xaphong1.jpg'),
                     price: p.price || 0,
                     stock_quantity: typeof p.stock_quantity !== 'undefined' ? p.stock_quantity : (p.stock || 0),
+                    colors: Array.isArray(p.colors) ? p.colors : (p.colors ? [p.colors] : []),
+                    size: Array.isArray(p.size) ? p.size : (p.size ? [p.size] : []),
                     // normalize category: backend may return string, object, or tags array
                     category: (typeof p.category === 'string') ? p.category : (p.category?.name || p.category?.title || (Array.isArray(p.tags) && p.tags[0]) || null),
                     oldPrice: p.oldPrice || p.previous_price || null,
@@ -103,9 +113,63 @@ export default function ProductPage() {
                 {error && <p className="text-red-600">{error}</p>}
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
                     {products.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard key={product.id} product={product} onQuickAdd={(p) => { setQuickProduct(p); setQuickOpen(true); setQpColor(''); setQpSize(p.size && p.size.length > 0 ? p.size[0] : ''); setQpQty(1); }} />
                     ))}
                 </div>
+
+                {/* Quick-add modal at page level */}
+                {quickOpen && quickProduct && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                            <h3 className="text-lg font-semibold mb-3">Thêm {quickProduct.name}</h3>
+                            {Array.isArray(quickProduct.colors) && quickProduct.colors.length > 0 && (
+                                <div className="mb-3">
+                                    <div className="text-sm font-medium mb-1">Màu</div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setQpColor('')} className={`w-8 h-8 rounded border flex items-center justify-center ${qpColor === '' ? 'ring-2 ring-lime-600' : ''}`}><span className="text-gray-400">×</span></button>
+                                        {quickProduct.colors.map((c, i) => (
+                                            <button key={i} type="button" onClick={() => setQpColor(c)} className={`w-8 h-8 rounded border ${qpColor === c ? 'ring-2 ring-lime-600' : ''}`} style={{ background: c }} />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {Array.isArray(quickProduct.size) && quickProduct.size.length > 0 && (
+                                <div className="mb-3">
+                                    <div className="text-sm font-medium mb-1">Kích thước</div>
+                                    <div className="flex gap-3">
+                                        {quickProduct.size.map((s, i) => (
+                                            <label key={i} className={`px-2 py-1 border rounded cursor-pointer ${qpSize === s ? 'bg-gray-100' : ''}`}>
+                                                <input type="radio" name="qp_size" value={s} checked={qpSize === s} onChange={() => setQpSize(s)} className="hidden" />
+                                                {s}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            <div className="mb-3 flex items-center gap-2">
+                                <div className="text-sm">Số lượng</div>
+                                <div className="ml-auto flex items-center gap-2">
+                                    <button onClick={() => setQpQty(q => Math.max(1, q - 1))} className="px-2 py-1 border rounded">-</button>
+                                    <div className="px-3">{qpQty}</div>
+                                    <button onClick={() => setQpQty(q => q + 1)} className="px-2 py-1 border rounded">+</button>
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <button onClick={() => setQuickOpen(false)} className="px-3 py-1 border rounded">Hủy</button>
+                                <button onClick={() => {
+                                    // validation
+                                    if (Array.isArray(quickProduct.colors) && quickProduct.colors.length > 0 && !qpColor) { addToast('Vui lòng chọn màu', { type: 'error' }); return; }
+                                    if (Array.isArray(quickProduct.size) && quickProduct.size.length > 0 && !qpSize) { addToast('Vui lòng chọn kích thước', { type: 'error' }); return; }
+                                    const item = { id: quickProduct.id || quickProduct._id, name: quickProduct.name, price: quickProduct.price, image: quickProduct.image, quantity: qpQty, stock: quickProduct.stock_quantity, color: qpColor, size: qpSize };
+                                    const res = addToCart(item);
+                                    if (!res) addToast('Không thể thêm vào giỏ hàng', { type: 'error' });
+                                    else addToast('Đã thêm vào giỏ hàng', { type: 'success' });
+                                    setQuickOpen(false);
+                                }} className="px-3 py-1 bg-lime-700 text-white rounded">Thêm vào giỏ</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

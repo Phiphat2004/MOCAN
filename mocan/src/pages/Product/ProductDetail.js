@@ -12,6 +12,8 @@ export default function ProductDetail() {
     const [error, setError] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [quantity, setQuantity] = useState(1);
+    const [selectedColor, setSelectedColor] = useState('');
+    const [selectedSize, setSelectedSize] = useState('');
     const { addToast } = useToast();
 
     useEffect(() => {
@@ -27,6 +29,10 @@ export default function ProductDetail() {
                 // initialize selected image when product data arrives
                 if (res.data && res.data.images && res.data.images.length > 0) {
                     setSelectedImage(res.data.images[0]);
+                }
+                // set default size to first element if available
+                if (res.data && Array.isArray(res.data.size) && res.data.size.length > 0) {
+                    setSelectedSize(res.data.size[0]);
                 }
             } catch (err) {
                 console.error('Failed to fetch product', err);
@@ -44,7 +50,7 @@ export default function ProductDetail() {
     if (error) return <div className="p-6 text-red-600">{error}</div>;
     if (!product) return <div className="p-6">No product found.</div>;
 
-    const { images = [], name, price, description, stock_quantity, category, dimensions = {}, createdAt } = product;
+    const { images = [], name, price, description, stock_quantity, category, dimensions = {}, createdAt, ingredients, skin_type, scent, colors = [], size = [] } = product;
     const inStock = (stock_quantity ?? 0) > 0;
     const statusText = inStock ? 'còn hàng' : 'hết hàng';
 
@@ -98,17 +104,62 @@ export default function ProductDetail() {
                         <span className="text-sm text-gray-700">{stock_quantity ?? 'N/A'}</span>
                     </div>
 
+
                     <div className="mb-2">
                         <span className="font-medium">Danh mục: </span>
                         <span className="text-sm text-gray-700">{category || 'N/A'}</span>
                     </div>
 
-                    <div className="mt-4">
-                        <h3 className="font-medium">Kích thước</h3>
-                        <div className="text-sm text-gray-700">
-                            Chiều dài: {dimensions.length ?? 0} | Chiều rộng: {dimensions.width ?? 0} | Chiều cao: {dimensions.height ?? 0}
-                        </div>
+                    <div className="mb-2">
+                        <span className="font-medium">Thành phần: </span>
+                        <span className="text-sm text-gray-700">{
+                            Array.isArray(ingredients)
+                                ? ingredients.filter(Boolean).map(ing => String(ing).replace(/\[|\]|"/g, '').trim()).join(', ')
+                                : (typeof ingredients === 'string'
+                                    ? ingredients.replace(/\[|\]|"/g, '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
+                                    : 'N/A')
+                        }</span>
                     </div>
+                    <div className="mb-2">
+                        <span className="font-medium">Loại da phù hợp: </span>
+                        <span className="text-sm text-gray-700">{skin_type || 'N/A'}</span>
+                    </div>
+                    <div className="mb-2">
+                        <span className="font-medium">Mùi hương: </span>
+                        <span className="text-sm text-gray-700">{scent || 'N/A'}</span>
+                    </div>
+
+                    {/* Chọn màu */}
+                    {Array.isArray(colors) && colors.length > 0 && (
+                        <div className="mt-4">
+                            <h3 className="font-medium">Chọn màu <span className="text-red-600">*</span></h3>
+                            <div className="flex gap-2 mt-2 flex-wrap">
+                                <button type="button" onClick={() => setSelectedColor('')} className={`w-8 h-8 rounded border flex items-center justify-center bg-white ${selectedColor === '' ? 'ring-2 ring-lime-600' : ''}`}
+                                    title="Không chọn màu">
+                                    <span className="text-gray-400 text-xl">×</span>
+                                </button>
+                                {colors.map((c, i) => (
+                                    <button key={i} type="button" onClick={() => setSelectedColor(c)} className={`w-8 h-8 rounded border ${selectedColor === c ? 'ring-2 ring-lime-600' : ''}`} style={{ background: c }} />
+                                ))}
+                            </div>
+                            {selectedColor && <div className="mt-1 text-sm">Đã chọn: <span className="font-semibold">{selectedColor}</span></div>}
+                            {!selectedColor && <div className="mt-1 text-sm text-red-600">Vui lòng chọn màu trước khi thêm vào giỏ hàng.</div>}
+                        </div>
+                    )}
+                    {/* Chọn size */}
+                    {Array.isArray(size) && size.length > 0 && (
+                        <div className="mt-4">
+                            <h3 className="font-medium">Chọn kích thước</h3>
+                            <div className="flex gap-4 mt-2">
+                                {size.map((s, i) => (
+                                    <label key={i} className="flex items-center gap-2">
+                                        <input type="radio" name="size" value={s} checked={selectedSize === s} onChange={() => setSelectedSize(s)} /> {s}
+                                    </label>
+                                ))}
+                            </div>
+                            {selectedSize && <div className="mt-1 text-sm">Đã chọn: <span className="font-semibold">{selectedSize}</span></div>}
+                        </div>
+                    )}
 
                     <div className="mt-4 text-xs text-gray-500">Ngày tạo: {createdAt ? new Date(createdAt).toLocaleString() : 'N/A'}</div>
                     {/* Quantity & Add to Cart */}
@@ -137,7 +188,10 @@ export default function ProductDetail() {
                                     addToast('Sản phẩm đã hết hàng, không thể thêm vào giỏ.', { type: 'error' });
                                     return;
                                 }
-
+                                if ((Array.isArray(colors) && colors.length > 0 && !selectedColor) || (Array.isArray(size) && size.length > 0 && !selectedSize)) {
+                                    addToast('Vui lòng chọn màu và kích thước trước khi thêm vào giỏ.', { type: 'error' });
+                                    return;
+                                }
                                 const item = {
                                     id: product._id || product.id,
                                     name,
@@ -145,6 +199,8 @@ export default function ProductDetail() {
                                     image: selectedImage || (images && images[0]) || '',
                                     quantity,
                                     stock: stock_quantity,
+                                    color: selectedColor,
+                                    size: selectedSize,
                                 };
                                 const updated = addToCart(item);
                                 if (!updated) {

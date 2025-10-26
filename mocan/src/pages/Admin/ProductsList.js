@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Button, Space, Popconfirm } from 'antd';
+import { Table, Button, Space, Popconfirm, Input, Select } from 'antd';
 import AddProductModal from '../../components/Admin/AddProductModal';
 import UpdateProductModal from '../../components/Admin/UpdateProductModal';
+import ProductDetailModal from '../../components/Admin/ProductDetailModal';
 import axiosInstance from '../../utils/axiosConfig';
 import 'antd/dist/reset.css';
 import { useToast } from '../../components/Toast/ToastProvider';
@@ -11,7 +12,11 @@ export default function ProductsList() {
     const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [selected, setSelected] = useState(null);
+    const [detailOpen, setDetailOpen] = useState(false);
+    const [detailProduct, setDetailProduct] = useState(null);
     const [products, setProducts] = useState([]);
+    const [search, setSearch] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -32,6 +37,24 @@ export default function ProductsList() {
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
+
+    // fixed categories for filtering
+    const categories = ['Men', 'Women', 'Kid'];
+
+    const filteredProducts = React.useMemo(() => {
+        const q = (search || '').trim().toLowerCase();
+        return products.filter(p => {
+            if (q) {
+                // only search by product name
+                const inName = (p.name || '').toLowerCase().includes(q);
+                if (!inName) return false;
+            }
+            if (categoryFilter) {
+                if ((p.category || '') !== categoryFilter) return false;
+            }
+            return true;
+        });
+    }, [products, search, categoryFilter]);
 
     const { addToast } = useToast();
 
@@ -68,12 +91,38 @@ export default function ProductsList() {
 
             {!loading && !error && (
                 <div className="mt-4">
+                    {/* Filters: search, category, price range */}
+                    <div className="mb-4">
+                        <div className="flex flex-wrap gap-3 items-center">
+                            <Input.Search
+                                placeholder="Tìm theo tên sản phẩm..."
+                                allowClear
+                                onSearch={(v) => setSearch(v)}
+                                onChange={(e) => setSearch(e.target.value)}
+                                style={{ width: 300 }}
+                                value={search}
+                            />
+
+                            <Select
+                                placeholder="Lọc theo danh mục"
+                                allowClear
+                                style={{ width: 220 }}
+                                value={categoryFilter}
+                                onChange={(v) => setCategoryFilter(v)}
+                            >
+                                {categories.map(c => <Select.Option key={c} value={c}>{c}</Select.Option>)}
+                            </Select>
+
+                            <Button onClick={() => { setSearch(''); setCategoryFilter(null); }}>Clear</Button>
+                        </div>
+                    </div>
+
                     {products.length === 0 ? (
                         <p className="text-gray-600">No products found.</p>
                     ) : (
                         <Table
                             rowKey={(record) => record._id}
-                            dataSource={products}
+                            dataSource={filteredProducts}
                             pagination={{ pageSize: 10 }}
                             columns={[
                                 {
@@ -95,8 +144,10 @@ export default function ProductsList() {
                                     key: 'name',
                                     render: (text, record) => (
                                         <div>
-                                            <div className="font-medium">{text}</div>
-                                            <div className="text-sm text-gray-500">{record.sku || ''}</div>
+                                            <button onClick={() => { setDetailProduct(record); setDetailOpen(true); }} className="text-left">
+                                                <div className="font-medium text-left hover:underline text-lime-700">{text}</div>
+                                                <div className="text-sm text-gray-500">{record.sku || ''}</div>
+                                            </button>
                                         </div>
                                     ),
                                 },
@@ -154,6 +205,11 @@ export default function ProductsList() {
                     }}
                 />
             )}
+            <ProductDetailModal
+                open={detailOpen}
+                product={detailProduct}
+                onClose={() => { setDetailOpen(false); setDetailProduct(null); }}
+            />
         </div>
     );
 }

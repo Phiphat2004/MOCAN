@@ -8,6 +8,7 @@ export default function AddProductForm({ onSuccess, onCancel }) {
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
     const [images, setImages] = useState([]);
+
     const [loading, setLoading] = useState(false);
 
     const addColor = (value) => {
@@ -42,19 +43,13 @@ export default function AddProductForm({ onSuccess, onCancel }) {
             const formData = new FormData(event.target);
             const ingredientsRaw = formData.get('ingredients') || '';
             const ingredients = (typeof ingredientsRaw === 'string') ? ingredientsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
-
+            const size = formData.getAll('size');
             const product = {
                 name: formData.get('name'),
                 price: Number(formData.get('price')) || 0,
                 category: formData.get('category') || '',
                 description: formData.get('description') || '',
                 ingredients,
-                weight: Number(formData.get('weight')) || 0,
-                dimensions: {
-                    length: Number(formData.get('length')) || 0,
-                    width: Number(formData.get('width')) || 0,
-                    height: Number(formData.get('height')) || 0,
-                },
                 stock_quantity: Number(formData.get('stock_quantity')) || 0,
                 skin_type: formData.get('skin_type') || '',
                 colors,
@@ -62,6 +57,7 @@ export default function AddProductForm({ onSuccess, onCancel }) {
                 manufacture_date: formData.get('manufacture_date') || undefined,
                 expiry_date: formData.get('expiry_date') || undefined,
                 tags,
+                size,
             };
 
             if (images && images.length > 0) {
@@ -112,39 +108,47 @@ export default function AddProductForm({ onSuccess, onCancel }) {
                 </div>
                 <div>
                     <label className="block text-sm">Category</label>
-                    <input name="category" className="mt-1 block w-full border rounded px-3 py-2" />
+                    <select name="category" required className="mt-1 block w-full border rounded px-3 py-2">
+                        <option value="">Select category</option>
+                        <option value="Men">Men</option>
+                        <option value="Women">Women</option>
+                        <option value="Kid">Kid</option>
+                    </select>
                 </div>
                 <div className="md:col-span-2">
                     <label className="block text-sm">Description</label>
                     <textarea name="description" className="mt-1 block w-full border rounded px-3 py-2" rows={3} />
                 </div>
                 <div className="md:col-span-2">
-                    <label className="block text-sm">Ingredients (comma separated)</label>
-                    <input name="ingredients" className="mt-1 block w-full border rounded px-3 py-2" />
+                    <label className="block text-sm">Ingredients (Thành phần, cách nhau dấu phẩy)</label>
+                    <input name="ingredients" className="mt-1 block w-full border rounded px-3 py-2" placeholder="Ví dụ: Dầu dừa, Tinh dầu tràm, ..." />
+                </div>
+                <div>
+                    <label className="block text-sm">Loại da phù hợp (Skin type)</label>
+                    <input name="skin_type" className="mt-1 block w-full border rounded px-3 py-2" placeholder="Ví dụ: Da dầu, Da khô, Da nhạy cảm..." />
+                </div>
+                <div>
+                    <label className="block text-sm">Mùi hương (Scent)</label>
+                    <input name="scent" className="mt-1 block w-full border rounded px-3 py-2" placeholder="Ví dụ: Hương tràm, Hương cam, ..." />
                 </div>
                 <div>
                     <label className="block text-sm">Price</label>
                     <input name="price" type="number" className="mt-1 block w-full border rounded px-3 py-2" />
                 </div>
                 <div>
-                    <label className="block text-sm">Weight (g)</label>
-                    <input name="weight" type="number" step="any" className="mt-1 block w-full border rounded px-3 py-2" />
-                </div>
-                <div>
                     <label className="block text-sm">Stock quantity</label>
                     <input name="stock_quantity" type="number" className="mt-1 block w-full border rounded px-3 py-2" />
                 </div>
                 <div>
-                    <label className="block text-sm">Length (cm)</label>
-                    <input name="length" type="number" step="any" className="mt-1 block w-full border rounded px-3 py-2" />
-                </div>
-                <div>
-                    <label className="block text-sm">Width (cm)</label>
-                    <input name="width" type="number" step="any" className="mt-1 block w-full border rounded px-3 py-2" />
-                </div>
-                <div>
-                    <label className="block text-sm">Height (cm)</label>
-                    <input name="height" type="number" step="any" className="mt-1 block w-full border rounded px-3 py-2" />
+                    <label className="block text-sm">Kích thước (Size)</label>
+                    <div className="flex gap-4 mt-1">
+                        <label className="flex items-center gap-2">
+                            <input type="checkbox" name="size" value="Lớn" /> Lớn
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <input type="checkbox" name="size" value="Nhỏ" /> Nhỏ
+                        </label>
+                    </div>
                 </div>
             </div>
 

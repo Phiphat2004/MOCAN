@@ -4,7 +4,9 @@ import { useToast } from '../Toast/ToastProvider';
 
 export default function UpdateProductForm({ product, onSuccess, onCancel }) {
     const [colors, setColors] = useState(product?.colors || []);
+    const [colorInput, setColorInput] = useState('');
     const [tags, setTags] = useState(product?.tags || []);
+    const [tagInput, setTagInput] = useState('');
     const [images, setImages] = useState([]); // new files
     const [existingImages, setExistingImages] = useState(product?.images || []);
     const [removedImages, setRemovedImages] = useState([]);
@@ -46,17 +48,16 @@ export default function UpdateProductForm({ product, onSuccess, onCancel }) {
             const form = new FormData(e.target);
             const body = {};
             // collect fields from form
-            ['name', 'category', 'description', 'price', 'weight', 'stock_quantity', 'manufacture_date', 'expiry_date', 'scent', 'skin_type'].forEach(k => {
+            ['name', 'category', 'description', 'price', 'stock_quantity', 'manufacture_date', 'expiry_date', 'scent', 'skin_type', 'ingredients'].forEach(k => {
                 const v = form.get(k);
                 if (v !== null && v !== '') body[k] = v;
             });
-            // dimensions
-            const dimensions = {
-                length: Number(form.get('length')) || 0,
-                width: Number(form.get('width')) || 0,
-                height: Number(form.get('height')) || 0,
-            };
-            body.dimensions = dimensions;
+            // collect size as array
+            body.size = form.getAll('size');
+            // collect colors and tags
+            body.colors = colors;
+            body.tags = tags;
+
             body.colors = colors;
             body.tags = tags;
 
@@ -113,35 +114,77 @@ export default function UpdateProductForm({ product, onSuccess, onCancel }) {
                 </div>
                 <div>
                     <label className="block text-sm">Category</label>
-                    <input name="category" defaultValue={product?.category} className="mt-1 block w-full border rounded px-3 py-2" />
+                    <select name="category" defaultValue={product?.category || ''} required className="mt-1 block w-full border rounded px-3 py-2">
+                        <option value="">Select category</option>
+                        <option value="Men">Men</option>
+                        <option value="Women">Women</option>
+                        <option value="Kid">Kid</option>
+                    </select>
                 </div>
                 <div className="md:col-span-2">
                     <label className="block text-sm">Description</label>
                     <textarea name="description" defaultValue={product?.description} className="mt-1 block w-full border rounded px-3 py-2" rows={3} />
+                </div>
+
+                <div className="md:col-span-2">
+                    <label className="block text-sm">Ingredients (Thành phần, cách nhau dấu phẩy)</label>
+                    <input name="ingredients" defaultValue={Array.isArray(product?.ingredients) ? product.ingredients.join(', ') : (product?.ingredients || '')} className="mt-1 block w-full border rounded px-3 py-2" placeholder="Ví dụ: Dầu dừa, Tinh dầu tràm, ..." />
+                </div>
+                <div>
+                    <label className="block text-sm">Loại da phù hợp (Skin type)</label>
+                    <input name="skin_type" defaultValue={product?.skin_type || ''} className="mt-1 block w-full border rounded px-3 py-2" placeholder="Ví dụ: Da dầu, Da khô, Da nhạy cảm..." />
+                </div>
+                <div>
+                    <label className="block text-sm">Mùi hương (Scent)</label>
+                    <input name="scent" defaultValue={product?.scent || ''} className="mt-1 block w-full border rounded px-3 py-2" placeholder="Ví dụ: Hương tràm, Hương cam, ..." />
                 </div>
                 <div>
                     <label className="block text-sm">Price</label>
                     <input name="price" type="number" defaultValue={product?.price} className="mt-1 block w-full border rounded px-3 py-2" />
                 </div>
                 <div>
-                    <label className="block text-sm">Weight (g)</label>
-                    <input name="weight" type="number" step="any" defaultValue={product?.weight ?? 0} className="mt-1 block w-full border rounded px-3 py-2" />
-                </div>
-                <div>
                     <label className="block text-sm">Stock quantity</label>
                     <input name="stock_quantity" type="number" defaultValue={product?.stock_quantity} className="mt-1 block w-full border rounded px-3 py-2" />
                 </div>
                 <div>
-                    <label className="block text-sm">Length (cm)</label>
-                    <input name="length" type="number" step="any" defaultValue={product?.dimensions?.length ?? 0} className="mt-1 block w-full border rounded px-3 py-2" />
+                    <label className="block text-sm">Kích thước (Size)</label>
+                    <div className="flex gap-4 mt-1">
+                        <label className="flex items-center gap-2">
+                            <input type="checkbox" name="size" value="Lớn" defaultChecked={product?.size?.includes('Lớn')} /> Lớn
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <input type="checkbox" name="size" value="Nhỏ" defaultChecked={product?.size?.includes('Nhỏ')} /> Nhỏ
+                        </label>
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm">Width (cm)</label>
-                    <input name="width" type="number" step="any" defaultValue={product?.dimensions?.width ?? 0} className="mt-1 block w-full border rounded px-3 py-2" />
+                <div className="md:col-span-2">
+                    <label className="block text-sm">Colors</label>
+                    <div className="mt-2 flex gap-2 flex-wrap">
+                        {["#FFFFFF", "#000000", "#F44336", "#E91E63", "#9C27B0", "#3F51B5", "#2196F3", "#4CAF50", "#FFEB3B", "#FF9800"].map(sw => (
+                            <button key={sw} type="button" onClick={() => { if (!colors.includes(sw)) setColors([...colors, sw]); }} className={`w-8 h-8 rounded border ${colors.includes(sw) ? 'ring-2 ring-lime-600' : ''}`} style={{ background: sw }} />
+                        ))}
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                        <input value={colorInput || ''} onChange={e => setColorInput(e.target.value)} className="flex-1 border rounded px-3 py-2" placeholder="#hex or name" />
+                        <button type="button" onClick={() => { const v = (colorInput ?? '').trim(); if (v && !colors.includes(v)) { setColors([...colors, v]); setColorInput(''); } }} className="px-3 py-2 bg-lime-700 text-white rounded">Add</button>
+                    </div>
+                    <div className="mt-2 flex gap-2 flex-wrap">
+                        {colors.map((c, i) => (
+                            <span key={i} className="bg-gray-100 px-2 py-1 rounded flex items-center gap-2">{c}<button type="button" onClick={() => setColors(colors.filter((_, idx) => idx !== i))} className="text-red-500">x</button></span>
+                        ))}
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm">Height (cm)</label>
-                    <input name="height" type="number" step="any" defaultValue={product?.dimensions?.height ?? 0} className="mt-1 block w-full border rounded px-3 py-2" />
+                <div className="md:col-span-2">
+                    <label className="block text-sm">Tags</label>
+                    <div className="flex gap-2 mt-1">
+                        <input value={tagInput || ''} onChange={e => setTagInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (tagInput && !tags.includes(tagInput)) { setTags([...tags, tagInput]); setTagInput(''); } } }} className="flex-1 border rounded px-3 py-2" placeholder="Add tag and press Enter" />
+                        <button type="button" onClick={() => { if (tagInput && !tags.includes(tagInput)) { setTags([...tags, tagInput]); setTagInput(''); } }} className="px-3 py-2 bg-lime-700 text-white rounded">Add</button>
+                    </div>
+                    <div className="mt-2 flex gap-2 flex-wrap">
+                        {tags.map((t, i) => (
+                            <span key={i} className="bg-gray-100 px-2 py-1 rounded flex items-center gap-2">{t}<button type="button" onClick={() => setTags(tags.filter((_, idx) => idx !== i))} className="text-red-500">x</button></span>
+                        ))}
+                    </div>
                 </div>
             </div>
 
