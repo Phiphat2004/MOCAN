@@ -5,14 +5,19 @@ export default function Hero() {
         {/* Left Text */}
         <div className="flex-1 text-center lg:text-left space-y-6">
           <h1 className="text-4xl lg:text-5xl font-extrabold text-black leading-tight">
-            DISCOVER SOAPS <br /> THAT NURTURE <br /> YOUR SKIN & SOUL
+            KHÁM PHÁ XÀ PHÒNG <br /> CHĂM SÓC <br /> LÀN DA & TÂM HỒN
           </h1>
           <p className="text-gray-600 text-base lg:text-lg max-w-md mx-auto lg:mx-0">
             Khám phá những thỏi xà phòng thiên nhiên tinh khiết, mang đến sự thư
             giãn và chăm sóc làn da mỗi ngày.
           </p>
-          <button className="bg-black text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition">
-            Shop Now
+          <button
+            onClick={() => {
+              window.location.href = "/products";
+            }}
+            className="bg-black text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition"
+          >
+            Khám Phá Ngay
           </button>
 
           {/* Stats */}

@@ -92,7 +92,7 @@ exports.createOrder = async (req, res) => {
           <td style="padding:8px;">${item.quantity}</td>
           <td style="padding:8px;">${item.unit_price.toLocaleString()}₫</td>
           <td style="padding:8px;">${item.total_price.toLocaleString()}₫</td>
-          <td style="padding:8px;">${item.color ? item.color : '-'}</td>
+          <td style="padding:8px;">${item.color}</td>
           <td style="padding:8px;">${item.size ? item.size : '-'}</td>
         </tr>
       `).join('');
@@ -134,7 +134,7 @@ exports.createOrder = async (req, res) => {
         subject: `Xác nhận đơn hàng #${savedOrder._id}`,
         html: mailHTML,
       });
-
+      console.log('savedDetails', savedDetails);
       console.log(`📩 Đã gửi email xác nhận tới ${guestInfo.email}`);
     }
 
