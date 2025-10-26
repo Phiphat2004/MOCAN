@@ -2,26 +2,21 @@ import { Link } from 'react-router-dom';
 import { addToCart } from '../utils/cart';
 import { useToast } from './Toast/ToastProvider';
 import formatVND from '../utils/formatPrice';
+import React, { useState } from 'react';
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, onQuickAdd }) {
     const stock = typeof product.stock_quantity !== 'undefined' ? product.stock_quantity : (product.stock || 0);
     const { addToast } = useToast();
-    const onAdd = (e) => {
-        // prevent Link navigation when clicking Add to cart
-        if (e && e.stopPropagation) {
-            e.stopPropagation();
-            e.preventDefault();
+    const openModal = (e) => {
+        if (e && e.stopPropagation) { e.stopPropagation(); e.preventDefault(); }
+        if (typeof onQuickAdd === 'function') onQuickAdd(product);
+        else {
+            // fallback: add immediately
+            const item = { id: product.id || product._id, name: product.name, price: product.price, image: product.image, quantity: 1, stock };
+            const res = addToCart(item);
+            if (!res) addToast('Không thể thêm vào giỏ hàng (có thể đã hết hàng).', { type: 'error' });
+            else addToast('Đã thêm vào giỏ hàng', { type: 'success' });
         }
-
-        const item = {
-            id: product.id || product._id,
-            name: product.name,
-            price: product.price,
-            image: product.image,
-        };
-        const res = addToCart({ ...item, stock });
-        if (!res) addToast('Không thể thêm vào giỏ hàng (có thể đã hết hàng).', { type: 'error' });
-        else addToast('Đã thêm vào giỏ hàng', { type: 'success' });
     };
 
     return (
@@ -53,7 +48,7 @@ export default function ProductCard({ product }) {
                 {/* Add to cart full width button */}
                 <div className="w-full mt-3 px-3">
                     <button
-                        onClick={onAdd}
+                        onClick={openModal}
                         className={`w-full flex items-center justify-center gap-2 px-3 py-2 ${stock > 0 ? 'bg-lime-600 hover:bg-lime-700 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'} rounded-md shadow-sm`}
                         aria-label={`Add ${product.name} to cart`}
                         disabled={stock <= 0}
@@ -66,6 +61,8 @@ export default function ProductCard({ product }) {
                         <span className="text-sm font-medium">{stock > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}</span>
                     </button>
                 </div>
+
+                {/* modal moved to page level via onQuickAdd */}
             </div>
         </Link>
     )

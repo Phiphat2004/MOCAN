@@ -7,15 +7,13 @@ export default function AdminSidebar() {
         { to: '/admin/dashboard', label: 'Dashboard' },
         { to: '/admin/products', label: 'Products' },
         { to: '/admin/orders', label: 'Orders' },
-        { to: '/admin/users', label: 'Users' },
-        { to: '/admin/settings', label: 'Settings' },
     ];
 
     return (
         <aside className="w-64 bg-white border-r border-gray-100 h-screen sticky top-0">
             <div className="p-4">
                 <h2 className="text-lg font-bold text-lime-700">Admin</h2>
-                <p className="text-xs text-gray-500">MỘC AN control</p>
+                <p className="text-xs text-gray-500">ECO SOAP control</p>
             </div>
 
             <nav className="mt-4 px-2">

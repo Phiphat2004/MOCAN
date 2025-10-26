@@ -139,13 +139,35 @@ export default function ProductDetailModal({ open, product, onClose }) {
                                         {detail.category || '—'}
                                     </div>
                                     <div>
-                                        <span className="font-semibold">Trọng lượng:</span>{' '}
-                                        {detail.weight ?? '—'} g
+                                        <span className="font-semibold">Loại da phù hợp:</span>{' '}
+                                        {detail.skin_type || '—'}
                                     </div>
-                                    {detail.dimensions && (
+                                    <div>
+                                        <span className="font-semibold">Mùi hương:</span>{' '}
+                                        {detail.scent || '—'}
+                                    </div>
+                                    <div className="col-span-2">
+                                        <span className="font-semibold">Thành phần:</span>{' '}
+                                        <span>{Array.isArray(detail.ingredients)
+                                            ? detail.ingredients.filter(Boolean).map(ing => String(ing).replace(/\[|\]|"/g, '').trim()).join(', ')
+                                            : (typeof detail.ingredients === 'string'
+                                                ? detail.ingredients.replace(/\[|\]|"/g, '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
+                                                : '—')}</span>
+                                    </div>
+                                    {Array.isArray(detail.colors) && detail.colors.length > 0 && (
+                                        <div className="col-span-2">
+                                            <span className="font-semibold">Màu sắc:</span>{' '}
+                                            <span className="inline-flex gap-2">
+                                                {detail.colors.map((c, i) => (
+                                                    <span key={i} className="inline-block w-6 h-6 rounded border" style={{ background: c }} title={c}></span>
+                                                ))}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {Array.isArray(detail.size) && detail.size.length > 0 && (
                                         <div className="col-span-2">
                                             <span className="font-semibold">Kích thước:</span>{' '}
-                                            {`${detail.dimensions.length} × ${detail.dimensions.width} × ${detail.dimensions.height} cm`}
+                                            {detail.size.join(', ')}
                                         </div>
                                     )}
                                     {detail.tags && detail.tags.length > 0 && (

@@ -84,7 +84,7 @@ exports.createOrder = async (req, res) => {
         },
       });
 
-      // tạo bảng HTML danh sách sản phẩm
+      // tạo bảng HTML danh sách sản phẩm, thêm màu sắc và kích thước
       const tableRows = savedDetails.map(item => `
         <tr style="border-bottom:1px solid #ddd;text-align:center;">
           <td style="padding:8px;"><img src="${item.image}" width="70" /></td>
@@ -92,12 +92,14 @@ exports.createOrder = async (req, res) => {
           <td style="padding:8px;">${item.quantity}</td>
           <td style="padding:8px;">${item.unit_price.toLocaleString()}₫</td>
           <td style="padding:8px;">${item.total_price.toLocaleString()}₫</td>
+          <td style="padding:8px;">${item.color ? item.color : '-'}</td>
+          <td style="padding:8px;">${item.size ? item.size : '-'}</td>
         </tr>
       `).join('');
 
       const mailHTML = `
         <div style="font-family:sans-serif;">
-          <h2>Cảm ơn bạn đã đặt hàng tại <span style="color:#4CAF50;">Mộc An</span>!</h2>
+          <h2>Cảm ơn bạn đã đặt hàng tại <span style="color:#4CAF50;">ECO SOAP</span>!</h2>
           <p>Mã đơn hàng: <strong>${savedOrder._id}</strong></p>
           <h3>Thông tin người nhận:</h3>
           <p><strong>Tên:</strong> ${guestInfo.name}</p>
@@ -113,18 +115,21 @@ exports.createOrder = async (req, res) => {
                 <th>Số lượng</th>
                 <th>Đơn giá</th>
                 <th>Thành tiền</th>
+                <th>Màu sắc</th>
+                <th>Kích thước</th>
               </tr>
             </thead>
             <tbody>${tableRows}</tbody>
           </table>
           <h3 style="text-align:right;margin-top:10px;">Tổng cộng: ${totalAmount.toLocaleString()}₫</h3>
           <p style="margin-top:20px;">Chúng tôi sẽ liên hệ xác nhận đơn hàng trong thời gian sớm nhất.</p>
-          <p>Trân trọng,<br/>Đội ngũ <strong>Mộc An</strong></p>
+          <p>Trân trọng,<br/>Đội ngũ <strong>ECO SOAP</strong></p>
+          <p>Số điện thoại: <strong>032 951 7751</strong></p>
         </div>
       `;
 
       await transporter.sendMail({
-        from: `"Mộc An" <${process.env.EMAIL_USER}>`,
+        from: `"ECO SOAP" <${process.env.EMAIL_USER}>`,
         to: guestInfo.email,
         subject: `Xác nhận đơn hàng #${savedOrder._id}`,
         html: mailHTML,
@@ -201,12 +206,22 @@ exports.deleteOrder = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: "Order not found" });
+
+    // Nếu chuyển sang 'hủy' và trạng thái cũ không phải 'hủy', hoàn lại số lượng sản phẩm
+    if (status === "hủy" && order.status !== "hủy") {
+      for (const item of order.order_detail) {
+        const pid = item.product_id;
+        const qty = Number(item.quantity || 0);
+        if (pid && qty > 0) {
+          await Product.findByIdAndUpdate(pid, { $inc: { stock_quantity: qty } });
+        }
+      }
+    }
+
+    order.status = status;
+    await order.save();
     res.json(order);
   } catch (error) {
     res.status(400).json({ message: error.message });

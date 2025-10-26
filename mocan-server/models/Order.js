@@ -29,6 +29,8 @@ const OrderSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
+        size: { type: String },
+        color: { type: String },
         quantity: { type: Number, required: true },
         unit_price: { type: Number, required: true },
         total_price: { type: Number, required: true },

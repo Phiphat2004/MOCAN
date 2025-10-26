@@ -90,6 +90,18 @@ export default function CartPage() {
                             <div>
                                 <div className="font-medium">{it.name}</div>
                                 <div className="text-sm text-gray-600">{formatVND(it.price)}</div>
+                                {it.color && (
+                                    <div className="text-xs mt-1 flex items-center gap-2">
+                                        <span>Màu:</span>
+                                        <span className="inline-block w-5 h-5 rounded border" style={{ background: it.color }} title={it.color}></span>
+                                        <span className="ml-1">{it.color}</span>
+                                    </div>
+                                )}
+                                {it.size && (
+                                    <div className="text-xs mt-1">
+                                        <span>Kích thước:</span> <span className="font-semibold">{it.size}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

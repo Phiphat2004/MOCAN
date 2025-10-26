@@ -46,6 +46,24 @@ export default function Orders() {
         return true;
     });
 
+    const statusOptions = ["đang xử lý", "đang giao", "đã giao", "hủy"];
+    const [editingStatusId, setEditingStatusId] = useState(null);
+    const [statusLoading, setStatusLoading] = useState(false);
+    const [statusValue, setStatusValue] = useState("");
+
+    const handleStatusChange = async (orderId, newStatus) => {
+        setStatusLoading(true);
+        try {
+            await axiosInstance.put(`/orders/${orderId}/status`, { status: newStatus });
+            setOrders(orders => orders.map(o => o._id === orderId ? { ...o, status: newStatus } : o));
+        } catch (err) {
+            // Optionally show error toast
+            console.error("Failed to update status", err);
+        } finally {
+            setStatusLoading(false);
+            setEditingStatusId(null);
+        }
+    };
     const columns = [
         {
             title: 'Mã đơn hàng',
@@ -86,7 +104,7 @@ export default function Orders() {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',
-            render: status => {
+            render: (status, record) => {
                 const colorMap = {
                     'đang xử lý': 'orange',
                     'đang giao': 'blue',
@@ -94,18 +112,47 @@ export default function Orders() {
                     'hủy': 'red'
                 };
                 const color = colorMap[status] || 'default';
+                if (editingStatusId === record._id) {
+                    return (
+                        <Select
+                            value={statusValue || status}
+                            onChange={v => setStatusValue(v)}
+                            style={{ width: 120 }}
+                            disabled={statusLoading}
+                        >
+                            {statusOptions.map(opt => (
+                                <Select.Option key={opt} value={opt}>{opt}</Select.Option>
+                            ))}
+                        </Select>
+                    );
+                }
                 return <Tag color={color}>{status}</Tag>;
             }
         },
         {
             title: 'Hành động',
             key: 'actions',
-            render: (text, record) => (
-                <Space>
-                    <Button size="small" onClick={() => setCustomerModal({ visible: true, guest: record.guest && record.guest[0] })}>Xem khách</Button>
-                    <Button size="small" onClick={() => setProductModal({ visible: true, items: record.order_detail || [] })}>Xem sản phẩm</Button>
-                </Space>
-            )
+            render: (text, record) => {
+                const isFinal = record.status === "đã giao" || record.status === "hủy";
+                return (
+                    <Space>
+                        <Button size="small" onClick={() => setCustomerModal({ visible: true, guest: record.guest && record.guest[0] })}>Xem khách</Button>
+                        <Button size="small" onClick={() => setProductModal({ visible: true, items: record.order_detail || [] })}>Xem sản phẩm</Button>
+                        {!isFinal && (
+                            editingStatusId === record._id ? (
+                                <Button
+                                    size="small"
+                                    type="primary"
+                                    loading={statusLoading}
+                                    onClick={() => handleStatusChange(record._id, statusValue || record.status)}
+                                >Lưu trạng thái</Button>
+                            ) : (
+                                <Button size="small" onClick={() => { setEditingStatusId(record._id); setStatusValue(record.status); }}>Đổi trạng thái</Button>
+                            )
+                        )}
+                    </Space>
+                );
+            }
         }
     ];
 
@@ -171,7 +218,10 @@ export default function Orders() {
                                         ) : null}
                                     </div>
                                     <div className="flex-1">
-                                        <button onClick={() => setProductDetailModal({ visible: true, product: p || (item.product_id || item) })} className="text-left w-full">
+                                        <button onClick={() => {
+                                            setProductModal({ visible: false, items: [] });
+                                            setProductDetailModal({ visible: true, product: p || (item.product_id || item) });
+                                        }} className="text-left w-full">
                                             <div className="font-semibold text-lime-700 hover:underline">{p && p.name}</div>
                                             <div className="text-sm text-gray-600">Loại: {p && p.category}</div>
                                             <div className="text-sm text-gray-600">Giá: {formatVND(item.unit_price || (p && p.price))}</div>

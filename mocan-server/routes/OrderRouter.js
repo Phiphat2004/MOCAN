@@ -9,6 +9,6 @@ router.get("/", OrderController.getAllOrders);
 router.get("/:id", OrderController.getOrderById);
 router.put("/:id", OrderController.updateOrder);
 router.delete("/:id", OrderController.deleteOrder);
-router.patch("/:id/status", authMiddleware, OrderController.updateOrderStatus);
+router.put("/:id/status", authMiddleware, OrderController.updateOrderStatus);
 
 module.exports = router;

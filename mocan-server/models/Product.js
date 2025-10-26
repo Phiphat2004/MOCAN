@@ -6,12 +6,7 @@ const ProductSchema = new mongoose.Schema(
     category: { type: String },
     description: { type: String },
     ingredients: [{ type: String }],
-    weight: { type: Number },
-    dimensions: {
-      length: Number,
-      width: Number,
-      height: Number,
-    },
+    size: [{ type: String }],
     skin_type: { type: String },
     colors: [{ type: String }],
     scent: { type: String },

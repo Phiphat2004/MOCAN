@@ -5,12 +5,11 @@ export default function Hero() {
         {/* Left Text */}
         <div className="flex-1 text-center lg:text-left space-y-6">
           <h1 className="text-4xl lg:text-5xl font-extrabold text-black leading-tight">
-            FIND CLOTHES <br /> THAT MATCHES <br /> YOUR STYLE
+            DISCOVER SOAPS <br /> THAT NURTURE <br /> YOUR SKIN & SOUL
           </h1>
           <p className="text-gray-600 text-base lg:text-lg max-w-md mx-auto lg:mx-0">
-            Browse through our diverse range of meticulously crafted garments,
-            designed to bring out your individuality and cater to your sense of
-            style.
+            Khám phá những thỏi xà phòng thiên nhiên tinh khiết, mang đến sự thư
+            giãn và chăm sóc làn da mỗi ngày.
           </p>
           <button className="bg-black text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition">
             Shop Now
@@ -19,16 +18,16 @@ export default function Hero() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-6 pt-8">
             <div>
-              <h3 className="text-2xl font-bold">200+</h3>
-              <p className="text-gray-600 text-sm">International Brands</p>
+              <h3 className="text-2xl font-bold">100%</h3>
+              <p className="text-gray-600 text-sm">Nguyên liệu thiên nhiên</p>
             </div>
             <div>
-              <h3 className="text-2xl font-bold">2,000+</h3>
-              <p className="text-gray-600 text-sm">High-Quality Products</p>
+              <h3 className="text-2xl font-bold">100%</h3>
+              <p className="text-gray-600 text-sm">Sản phẩm chất lượng cao</p>
             </div>
             <div>
-              <h3 className="text-2xl font-bold">30,000+</h3>
-              <p className="text-gray-600 text-sm">Happy Customers</p>
+              <h3 className="text-2xl font-bold">100%</h3>
+              <p className="text-gray-600 text-sm">Khách hàng hài lòng</p>
             </div>
           </div>
         </div>

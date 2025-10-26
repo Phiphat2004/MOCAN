@@ -11,8 +11,6 @@ import AdminLayout from './components/Admin/AdminLayout';
 import DashboardPage from './pages/Admin/DashboardPage';
 import ProductsList from './pages/Admin/ProductsList';
 import Orders from './pages/Admin/Orders';
-import Users from './pages/Admin/Users';
-import Settings from './pages/Admin/Settings';
 import ToastProvider from './components/Toast/ToastProvider';
 
 function AppContent() {
@@ -35,8 +33,6 @@ function AppContent() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="products" element={<ProductsList />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="users" element={<Users />} />
-          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
 
