@@ -1,5 +1,5 @@
 // load environment variables as early as possible
-require('dotenv').config();
+require("dotenv").config();
 
 var createError = require("http-errors");
 var express = require("express");
@@ -21,7 +21,7 @@ const db = require("./Loaders/Mongooes");
 
 app.use(
   cors({
-    origin: "https://ecosoap-henna.vercel.app/",
+    origin: ["https://ecosoap-henna.vercel.app/", "http://localhost:3001"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -36,6 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cors());
 
 app.connect = db;
 

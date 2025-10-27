@@ -3,22 +3,25 @@ import axios from "axios";
 
 // Tạo instance của axios
 const axiosInstance = axios.create({
-    baseURL: "https://ecosoap-q9lr.onrender.com/api", // Base URL cho toàn bộ API
-    headers: {
-        "Content-Type": "application/json",
-    },
+  baseURL: [
+    "https://ecosoap-q9lr.onrender.com/api",
+    "http://localhost:3000/api",
+  ],
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Thêm interceptor để tự động gắn token vào request
 axiosInstance.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`; // Gắn token vào header
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`; // Gắn token vào header
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
 export default axiosInstance;
