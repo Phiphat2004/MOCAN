@@ -19,14 +19,20 @@ var app = express();
 
 const db = require("./Loaders/Mongooes");
 
-app.use(
-  cors({
-    origin: ["https://ecosoap-henna.vercel.app/", "http://localhost:3001"],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+// configure CORS for the API routers
+const corsOptions = {
+  // allowed origins (no trailing slashes)
+  origin: [
+    "https://ecosoap-henna.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:3001",
+  ],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -37,7 +43,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors());
 
 app.connect = db;
 
