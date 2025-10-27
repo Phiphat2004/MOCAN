@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Tạo instance của axios
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000/api", // Base URL cho toàn bộ API
+    baseURL: "https://ecosoap-q9lr.onrender.com/api", // Base URL cho toàn bộ API
     headers: {
         "Content-Type": "application/json",
     },
