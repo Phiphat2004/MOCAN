@@ -45,7 +45,7 @@ export default function CartPage() {
             return;
         }
 
-        const order_detail = cartItems.map(it => ({ product_id: it.id, quantity: it.quantity, unit_price: it.price }));
+        const order_detail = cartItems.map(it => ({ product_id: it.id, quantity: it.quantity, unit_price: it.price, size: it.size, color: it.color }));
         const payload = {
             guest: { name: guest.name, phone: guest.phone, email: guest.email || '', address: guest.address, note: guest.note },
             order_detail,
