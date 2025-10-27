@@ -22,6 +22,7 @@ const db = require("./Loaders/Mongooes");
 app.use(
   cors({
     origin: ["https://ecosoap-henna.vercel.app/", "http://localhost:3001"],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
