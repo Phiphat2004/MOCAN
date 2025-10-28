@@ -45,7 +45,19 @@ export default function CartPage() {
             return;
         }
 
-        const order_detail = cartItems.map(it => ({ product_id: it.id, quantity: it.quantity, unit_price: it.price, size: it.size, color: it.color }));
+        // client-side validation: ensure every cart item has an id and positive quantity
+        for (const it of cartItems) {
+            if (!it.id) {
+                addToast('Có sản phẩm trong giỏ thiếu id, vui lòng kiểm tra lại', { type: 'error' });
+                return;
+            }
+            if (!it.quantity || Number(it.quantity) <= 0) {
+                addToast('Số lượng sản phẩm không hợp lệ trong giỏ hàng', { type: 'error' });
+                return;
+            }
+        }
+
+        const order_detail = cartItems.map(it => ({ product_id: String(it.id), quantity: Number(it.quantity), unit_price: Number(it.price || 0), size: it.size || '', color: it.color || '' }));
         const payload = {
             guest: { name: guest.name, phone: guest.phone, email: guest.email || '', address: guest.address, note: guest.note },
             order_detail,
@@ -60,8 +72,13 @@ export default function CartPage() {
             setItems([]);
             closeCheckout();
         } catch (err) {
+            // detailed logging to help debug server-side validation errors (400)
             console.error('Order failed', err);
-            addToast(err?.response?.data?.message || 'Đặt hàng thất bại', { type: 'error' });
+            if (err?.response) {
+                console.error('Order failed response data:', err.response.data);
+            }
+            const serverMessage = err?.response?.data?.message || (err?.response?.data ? JSON.stringify(err.response.data) : null);
+            addToast(serverMessage || err?.message || 'Đặt hàng thất bại', { type: 'error' });
         } finally {
             setSubmitting(false);
         }
