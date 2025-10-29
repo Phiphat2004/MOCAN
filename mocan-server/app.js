@@ -22,13 +22,14 @@ const db = require("./Loaders/Mongooes");
 // configure CORS for the API routers
 const corsOptions = {
   // allowed origins (no trailing slashes)
-  origin: [
-    "https://ecosoap-henna.vercel.app",
-    "http://localhost:3000",
-    "http://localhost:3001",
-  ],
+  // origin: [
+  //   "https://ecosoap-henna.vercel.app",
+  //   "http://localhost:3000",
+  //   "http://localhost:3001",
+  // ],
+  origin: process.env.API_URL,
   allowedHeaders: ["Content-Type", "Authorization"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true,
 };
 
