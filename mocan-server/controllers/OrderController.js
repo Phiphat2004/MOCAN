@@ -75,89 +75,9 @@ exports.createOrder = async (req, res) => {
     const savedOrder = await orderDoc.save();
 
     // ----------------------------
-    // ✉️ GỬI EMAIL XÁC NHẬN
+    // ✨ PHẢN HỒI CHO FRONTEND (KHÔNG GỬI EMAIL TỰ ĐỘNG)
     // ----------------------------
-    if (guestInfo.email) {
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
-
-      // tạo bảng HTML danh sách sản phẩm, thêm màu sắc và kích thước
-      const tableRows = savedDetails.map(item => `
-        <tr style="border-bottom:1px solid #ddd;text-align:center;">
-          <td style="padding:8px;"><img src="${item.image}" width="70" /></td>
-          <td style="padding:8px;">${item.product_name}</td>
-          <td style="padding:8px;">${item.quantity}</td>
-          <td style="padding:8px;">${item.unit_price.toLocaleString()}₫</td>
-          <td style="padding:8px;">${item.total_price.toLocaleString()}₫</td>
-          <td style="padding:8px; text-align:center;">
-              ${
-        item.color
-          ? `<div style="
-                display:inline-block;
-                width:20px;
-                height:20px;
-                border-radius:50%;
-                background-color:${item.color};
-                border:1px solid #ccc;
-                vertical-align:middle;
-              " title="${item.color}">
-            </div>`
-          : '-'
-      }
-          </td>
-          <td style="padding:8px;">${item.size ? item.size : '-'}</td>
-        </tr>
-      `).join('');
-
-      const mailHTML = `
-        <div style="font-family:sans-serif;">
-          <h2>Cảm ơn bạn đã đặt hàng tại <span style="color:#4CAF50;">ECO SOAP</span>!</h2>
-          <p>Mã đơn hàng: <strong>${savedOrder._id}</strong></p>
-          <h3>Thông tin người nhận:</h3>
-          <p><strong>Tên:</strong> ${guestInfo.name}</p>
-          <p><strong>Số điện thoại:</strong> ${guestInfo.phone}</p>
-          <p><strong>Địa chỉ:</strong> ${guestInfo.address}</p>
-          ${note ? `<p><strong>Ghi chú:</strong> ${note}</p>` : ''}
-          <h3>Chi tiết đơn hàng:</h3>
-          <table style="width:100%;border-collapse:collapse;margin-top:10px;">
-            <thead>
-              <tr style="background:#f4f4f4;">
-                <th>Hình ảnh</th>
-                <th>Sản phẩm</th>
-                <th>Số lượng</th>
-                <th>Đơn giá</th>
-                <th>Thành tiền</th>
-                <th>Màu sắc</th>
-                <th>Kích thước</th>
-              </tr>
-            </thead>
-            <tbody>${tableRows}</tbody>
-          </table>
-          <h3 style="text-align:right;margin-top:10px;">Tổng cộng: ${totalAmount.toLocaleString()}₫</h3>
-          <p style="margin-top:20px;">Chúng tôi sẽ liên hệ xác nhận đơn hàng trong thời gian sớm nhất.</p>
-          <p>Trân trọng,<br/>Đội ngũ <strong>ECO SOAP</strong></p>
-          <p>Số điện thoại: <strong>032 951 7751</strong></p>
-        </div>
-      `;
-
-      await transporter.sendMail({
-        from: `"ECO SOAP" <${process.env.EMAIL_USER}>`,
-        to: guestInfo.email,
-        subject: `Xác nhận đơn hàng #${savedOrder._id}`,
-        html: mailHTML,
-      });
-      console.log('savedDetails', savedDetails);
-      console.log(`📩 Đã gửi email xác nhận tới ${guestInfo.email}`);
-    }
-
-    // ----------------------------
-    // ✨ PHẢN HỒI CHO FRONTEND
-    // ----------------------------
+    // Email xác nhận khi thanh toán đã bị tắt theo yêu cầu
     res.status(201).json({
       message: 'Đặt hàng thành công!',
       order_id: savedOrder._id,
@@ -174,8 +94,27 @@ exports.createOrder = async (req, res) => {
 // 🔵 Lấy tất cả Order
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate("order_detail.product_id");
-    res.json(orders);
+    const { phone } = req.query;
+    const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+    const limit = Math.max(parseInt(req.query.limit || '10', 10), 1);
+    const skip = (page - 1) * limit;
+
+    const query = {};
+    if (phone) {
+      // match orders where any guest entry has the provided phone
+      query['guest.phone'] = String(phone).trim();
+    }
+
+    const total = await Order.countDocuments(query);
+    const totalPages = Math.ceil(total / limit) || 1;
+
+    const orders = await Order.find(query)
+      .sort({ order_date: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('order_detail.product_id');
+
+    res.json({ orders, total, page, limit, totalPages });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

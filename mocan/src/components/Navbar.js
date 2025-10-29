@@ -5,12 +5,15 @@ import { cartCount } from "../utils/cart";
 export default function Navbar() {
   const [count, setCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   };
+
+
 
   useEffect(() => {
     const updateCount = () => {
@@ -44,8 +47,8 @@ export default function Navbar() {
   }, [isOpen]);
 
   return (
-      <nav className="bg-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-white shadow-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -82,7 +85,7 @@ export default function Navbar() {
               Về chúng tôi
             </Link>
             <Link
-              to="/support"  onClick={scrollToTop}
+              to="/support" onClick={scrollToTop}
               className="text-gray-600 hover:text-lime-700 font-medium transition-colors"
             >
               Hỗ trợ
@@ -90,7 +93,7 @@ export default function Navbar() {
 
             {/* Cart Icon */}
             <Link
-              to="/cart" 
+              to="/cart"
               className="relative p-2 text-gray-600 hover:text-lime-700 transition-colors"
               aria-label="Giỏ hàng"
             >
@@ -114,6 +117,9 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
+
+            {/* View orders button */}
+            <Link to="/orders/lookup" onClick={scrollToTop} className="px-3 py-2 border rounded text-sm text-gray-700 hover:bg-gray-50">Xem đơn hàng</Link>
 
             {/* Admin Login Button */}
             <Link
@@ -162,9 +168,8 @@ export default function Navbar() {
       {/* Mobile menu */}
       <div
         id="mobile-menu"
-        className={`md:hidden transition-all duration-300 ease-in-out ${
-          isOpen ? "max-h-screen" : "max-h-0 overflow-hidden"
-        }`}
+        className={`md:hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-screen" : "max-h-0 overflow-hidden"
+          }`}
       >
         <div className="px-4 pt-2 pb-4 space-y-2 bg-white">
           <Link
@@ -194,6 +199,14 @@ export default function Navbar() {
 
           {/* Mobile Cart Link */}
           <Link
+            to="/orders/lookup"
+            onClick={() => setIsOpen(false)}
+            className="block w-full text-left px-4 py-3 text-gray-600 hover:text-lime-700 hover:bg-gray-50 rounded-lg font-medium"
+          >
+            Xem đơn hàng
+          </Link>
+
+          <Link
             to="/cart"
             className="block px-4 py-3 text-gray-600 hover:text-lime-700 hover:bg-gray-50 rounded-lg font-medium"
           >
@@ -210,6 +223,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
     </nav>
   );
 }

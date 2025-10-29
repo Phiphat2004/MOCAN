@@ -9,6 +9,7 @@ export default function CartPage() {
     const [items, setItems] = useState([]);
     const [checkoutOpen, setCheckoutOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+
     const [guest, setGuest] = useState({ name: '', phone: '', email: '', address: '', note: '' });
     const { addToast } = useToast();
 
@@ -33,6 +34,7 @@ export default function CartPage() {
 
     const openCheckout = () => setCheckoutOpen(true);
     const closeCheckout = () => setCheckoutOpen(false);
+
 
     const submitOrder = async (e) => {
         e.preventDefault();
@@ -67,7 +69,7 @@ export default function CartPage() {
         try {
             setSubmitting(true);
             await axiosInstance.post('/orders', payload);
-            addToast('Đặt hàng thành công, thông tin về đơn hàng đã được gửi về email của bạn.', { type: 'success' });
+            addToast('Đặt hàng thành công.', { type: 'success' });
             clearCart();
             setItems([]);
             closeCheckout();
@@ -142,6 +144,7 @@ export default function CartPage() {
             <div className="mt-6 flex justify-between items-center">
                 <div>
                     <button onClick={onClear} className="px-4 py-2 bg-gray-100 border rounded">Clear cart</button>
+                    <Link to="/orders/lookup" className="ml-3 px-4 py-2 bg-white border rounded">Xem đơn hàng</Link>
                 </div>
                 <div className="text-right">
                     <div className="text-lg font-semibold">Total: {formatVND(total)}</div>
@@ -194,6 +197,7 @@ export default function CartPage() {
                     </div>
                 </div>
             )}
+
         </div>
     );
 }

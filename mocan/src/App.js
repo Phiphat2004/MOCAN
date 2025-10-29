@@ -25,6 +25,7 @@ import AdminLayout from './components/Admin/AdminLayout';
 import DashboardPage from './pages/Admin/DashboardPage';
 import ProductsList from './pages/Admin/ProductsList';
 import Orders from './pages/Admin/Orders';
+import OrderLookup from './pages/Order/OrderLookup';
 import ToastProvider from './components/Toast/ToastProvider';
 
 function AppContent() {
@@ -42,14 +43,15 @@ function AppContent() {
         <Route path="/features" element={<FeaturesPage />} />
         <Route path="/company-products" element={<CompanyProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/orders/lookup" element={<OrderLookup />} />
         <Route path="/login" element={<LoginPage />} />
-        
+
         {/* Help Routes */}
         <Route path="/support" element={<CustomerSupport />} />
         <Route path="/delivery-info" element={<DeliveryDetails />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
-        
+
         {/* FAQ Routes */}
         <Route path="/faq/account" element={<AccountFAQ />} />
         <Route path="/faq/delivery" element={<DeliveryFAQ />} />
