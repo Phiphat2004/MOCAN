@@ -21,21 +21,51 @@ export default function OrderLookup() {
 
     const renderColor = (it) => {
         if (!it) return '-';
-        const color = it.color;
-        if (!color) return '-';
-        // if color saved as object
-        if (typeof color === 'object') return color.name || color.label || String(color.value || JSON.stringify(color));
-        // try to resolve from populated product colors array
+        const colorRaw = it.color;
+        if (!colorRaw) return '-';
+
+        const normalize = (s) => String(s || '').toString().toLowerCase().trim().replace(/^#/, '');
+
+        // If color stored as object (e.g., { name, value, code })
+        if (typeof colorRaw === 'object') {
+            const name = colorRaw.name || colorRaw.label || colorRaw.display;
+            const code = colorRaw.code || colorRaw.value || colorRaw.hex || name;
+            return (
+                <span className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full" style={{ background: code || name }} />
+                </span>
+            );
+        }
+
+        const colorStr = String(colorRaw);
+
+        // try to resolve from populated product colors array (match by code/value/hex/_id/name)
         const pid = it.product_id;
         if (pid && typeof pid === 'object' && Array.isArray(pid.colors)) {
+            const target = normalize(colorStr);
             const found = pid.colors.find(c => {
                 if (!c) return false;
-                const code = (c.code || c.value || c.hex || c.name || '').toString().toLowerCase();
-                return code === String(color).toLowerCase();
+                const candidates = [c.code, c.value, c.hex, c._id, c.name, c.label];
+                return candidates.some(x => normalize(x) === target);
             });
-            if (found) return found.name || String(found.code || found.value || color);
+            if (found) {
+                const displayName = found.name || found.label || found.value || found.code || colorStr;
+                const swatch = found.code || found.value || found.hex || found.name;
+                return (
+                    <span className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full" style={{ background: swatch || colorStr }} />
+                    </span>
+                );
+            }
         }
-        return String(color);
+
+        // Fallback: show raw string but try to render a swatch when it's a color code/name
+        const isLikelyColorCode = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(colorStr.trim()) || /^rgb\(/i.test(colorStr.trim()) || /^[a-z]+$/i.test(colorStr.trim());
+        return (
+            <span className="flex items-center gap-2">
+                {isLikelyColorCode && <span className="w-5 h-5 rounded-full" style={{ background: colorStr }} />}
+            </span>
+        );
     };
 
     const renderItemImage = (it) => {
