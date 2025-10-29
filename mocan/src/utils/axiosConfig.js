@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Tạo instance của axios
 const axiosInstance = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL: "http://localhost:3000/api",
   headers: {
     "Content-Type": "application/json",
   },
