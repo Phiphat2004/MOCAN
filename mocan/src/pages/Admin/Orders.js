@@ -22,7 +22,15 @@ export default function Orders() {
             setLoading(true);
             try {
                 const res = await axiosInstance.get('/orders');
-                setOrders(res.data || []);
+                // Backend may return either an array or a paginated object { orders, total, page, limit }
+                const data = res.data;
+                if (Array.isArray(data)) {
+                    setOrders(data);
+                } else if (data && Array.isArray(data.orders)) {
+                    setOrders(data.orders);
+                } else {
+                    setOrders([]);
+                }
             } catch (err) {
                 console.error('Failed to fetch orders', err);
             } finally {
