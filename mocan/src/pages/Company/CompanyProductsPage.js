@@ -43,14 +43,16 @@ export default function CompanyProductsPage() {
       {/* Sản phẩm chính */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
         {/* Xà phòng tắm */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <img
-            src="/assets/xaphong1.jpg"
-            alt="Xà phòng tắm thảo mộc"
-            className="w-full h-64 object-contain bg-gray-50"
-          />
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300">
+          <div className="relative h-64 bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+            <img
+              src="/assets/xaphong5.JPG"
+              alt="Xà phòng tắm thảo mộc"
+              className="max-h-56 max-w-full object-contain drop-shadow-lg"
+            />
+          </div>
           <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4">
+            <h3 className="text-xl font-semibold mb-4 text-green-700">
               🧼 Xà phòng tắm thảo mộc
             </h3>
             <ul className="space-y-3 text-gray-600">
@@ -71,14 +73,16 @@ export default function CompanyProductsPage() {
         </div>
 
         {/* Xà phòng rửa mặt */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <img
-            src="/assets/xaphong2.jpg"
-            alt="Xà phòng rửa mặt tự nhiên"
-            className="w-full h-64 object-contain bg-gray-50"
-          />
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300">
+          <div className="relative h-64 bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+            <img
+              src="/assets/xaphong6.JPG"
+              alt="Xà phòng rửa mặt tự nhiên"
+              className="max-h-56 max-w-full object-contain drop-shadow-lg"
+            />
+          </div>
           <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4">
+            <h3 className="text-xl font-semibold mb-4 text-pink-700">
               🌸 Xà phòng rửa mặt tự nhiên
             </h3>
             <ul className="space-y-3 text-gray-600">
@@ -96,14 +100,16 @@ export default function CompanyProductsPage() {
         </div>
 
         {/* Bộ quà tặng */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <img
-            src="/assets/xaphong3.jpg"
-            alt="Bộ quà tặng EcoSet"
-            className="w-full h-64 object-contain bg-gray-50"
-          />
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300">
+          <div className="relative h-64 bg-gradient-to-br from-yellow-50 to-orange-50 flex items-center justify-center">
+            <img
+              src="/assets/xaphong7.JPG"
+              alt="Bộ quà tặng EcoSet"
+              className="max-h-56 max-w-full object-contain drop-shadow-lg"
+            />
+          </div>
           <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4">
+            <h3 className="text-xl font-semibold mb-4 text-orange-700">
               🎁 Bộ quà tặng EcoSet
             </h3>
             <ul className="space-y-3 text-gray-600">
