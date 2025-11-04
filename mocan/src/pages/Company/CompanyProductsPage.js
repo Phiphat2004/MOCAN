@@ -22,11 +22,11 @@ export default function CompanyProductsPage() {
       </div>
 
       {/* Banner image */}
-      <div className="relative h-96 mb-16 rounded-lg overflow-hidden">
+      <div className="relative mb-16 rounded-lg overflow-hidden">
         <img
-          src="/assets/banner1.jpg"
+          src="/assets/banner3.JPG"
           alt="Ecosoap Products"
-          className="w-full h-full object-contain bg-gray-50"
+          className="w-full h-auto max-h-80 object-cover"
         />
         <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
           <h2 className="text-3xl font-bold text-white text-center">
