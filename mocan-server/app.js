@@ -23,7 +23,7 @@ const db = require("./Loaders/Mongooes");
 const corsOptions = {
   // allowed origins (no trailing slashes)
   origin: [
-    "https://eco-soap.vercel.app/",
+    "https://eco-soap.vercel.app",
     "http://localhost:3000",
     "http://localhost:3001",
   ],
